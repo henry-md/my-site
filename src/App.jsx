@@ -30,7 +30,7 @@ function App() {
         <div className="header-text">
           <p className="subhead-small">Software Developer</p>
           <p className="subhead-big">
-            Computer science major at Johns Hopkins University
+            Full stack developer studying at Johns Hopkins University
           </p>
           <div>
             <p className="subhead-rainbow">Hi, I'm Henry</p>
