@@ -12,7 +12,7 @@ class FeaturedProject extends React.Component {
         <div className="featured-text">
           <p className="featured-title">{this.props.title}</p>
           <p className="featured-description">{this.props.description}</p>
-          <div className="call-to-action-container">
+          <div className="featured-call-container">
             <a href={this.props.callToActionLink} className="featured-call" target="_blank">{this.props.callToAction}</a>
             {this.props.secondCallToAction && <a href={this.props.secondCallToActionLink} className="featured-call" target="_blank">{this.props.secondCallToAction}</a>}
           </div>

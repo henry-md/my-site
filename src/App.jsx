@@ -74,7 +74,6 @@ function App() {
           secondCallToAction="View Github"
           secondCallToActionLink="https://github.com/henry-md/ChessHelper"
         />
-
         <FeaturedProject
           src="./src/assets/checkitout-demo.mov"
           alt="Check It Out project demo"
@@ -85,18 +84,16 @@ function App() {
           secondCallToAction="View Devpost"
           secondCallToActionLink="https://devpost.com/software/check-it-out"
         />
-
         <FeaturedProject
           src="./src/assets/chess-helper-demo.mov"
           alt="Chess Helper project demo"
           title="ChessHelper: An Interactive Way to Practice Chess Theory"
-          description="Understanding and memorizing chess theory is absolutely essential in becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
+          description="Understanding and memorizing chess theory is absolutely essential to becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
           callToAction="View Project"
           callToActionLink="https://henry-md.github.io/ChessHelper/"
           secondCallToAction="View Github"
           secondCallToActionLink="https://github.com/henry-md/ChessHelper"
         />
-
         <FeaturedProject
           src="./src/assets/typing-helper-demo.mov"
           alt="Typing helper project demo"
@@ -107,8 +104,6 @@ function App() {
           secondCallToAction="View Github"
           secondCallToActionLink="https://github.com/henry-md/Typing-Helper"
         />
-
-       
 
       </div>
     </div>
