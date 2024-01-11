@@ -63,11 +63,12 @@ function App() {
       {/* start featured projects section */}
       <div className="projects section">
         <h2>Featured Projects</h2>
+        {/* <p>A lot of the projects I make, including the ChessHelper and TypingHelper projects, I make because I want a website to exist that doesn't. </p> */}
         <FeaturedProject
           src="./src/assets/vincent-dunn-demo.mov"
-          alt="project 1"
-          title="Vincent Dunn"
-          description="PetCode is a Pet-Tech Startup that helps pet owners keep their furry friends safer, happier, and healthier with our Smart QR Tag and companion mobile app"
+          alt="Vincent Dunn website demo"
+          title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
+          description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace”, into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
           callToAction="View Project"
           callToActionLink="https://henry-md.github.io/ChessHelper/"
           secondCallToAction="View Github"
@@ -75,19 +76,48 @@ function App() {
         />
 
         <FeaturedProject
+          src="./src/assets/checkitout-demo.mov"
+          alt="Check It Out project demo"
+          title="CheckItOut: Computer Vision Powered Solution to Checkout"
+          description="Made a physical checkout counter with an integrated scale, overhead camera, and processing unit performing automatic detection and classification of grocery items. Lightweight classifier and detector using MobileNetV2, with robust accuracy."
+          callToAction="View Website"
+          callToActionLink="https://henry-md.github.io/CheckItOut/"
+          secondCallToAction="View Devpost"
+          secondCallToActionLink="https://devpost.com/software/check-it-out"
+        />
+
+        <FeaturedProject
           src="./src/assets/chess-helper-demo.mov"
-          alt="project 1"
+          alt="Chess Helper project demo"
           title="ChessHelper: An Interactive Way to Practice Chess Theory"
-          description="Understanding and memorizing chess theory is absolutely essential in becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper! I couldn't find any site/app that did this, so I made this for myself."
+          description="Understanding and memorizing chess theory is absolutely essential in becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
           callToAction="View Project"
           callToActionLink="https://henry-md.github.io/ChessHelper/"
           secondCallToAction="View Github"
           secondCallToActionLink="https://github.com/henry-md/ChessHelper"
         />
+
+        <FeaturedProject
+          src="./src/assets/typing-helper-demo.mov"
+          alt="Typing helper project demo"
+          title="TypingHelper: Improve Special Character Typing Speed"
+          description="Generates typing test heavy in special characters to help with typing speed when coding. You can programatically control variables like the method used to generate the typing test, length of the test, and concentration of special characters."
+          callToAction="View Project"
+          callToActionLink="https://henry-md.github.io/Typing-Helper/"
+          secondCallToAction="View Github"
+          secondCallToActionLink="https://github.com/henry-md/Typing-Helper"
+        />
+
+       
+
       </div>
     </div>
     </>
   )
 }
+
+/*
+
+*/
 
 export default App
