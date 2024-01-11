@@ -82,7 +82,34 @@ class TestimonialSwiper extends React.Component {
             </div>
           </div>
         </SwiperSlide>
-        <SwiperSlide>Coming Soon</SwiperSlide>
+        <SwiperSlide>
+          <div className="quote-content">
+            <img
+              className="open-quote"
+              src={quote}
+              alt="Open Quote"
+            />
+            <img
+              className="close-quote"
+              src={quote}
+              alt="Close Quote"
+            />
+            <p>
+              Coming Soon
+            </p>
+          </div>
+          <div className="tab-footer">
+            <img
+              src={"https://www.w3schools.com/howto/img_avatar.png"}
+              alt="Avatar"
+              className="avatar"
+            />
+            <div className="name-title">
+              <p>First Last</p>
+              <p>Title</p>
+            </div>
+          </div>
+        </SwiperSlide>
       </Swiper>
 
       

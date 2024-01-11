@@ -15,7 +15,7 @@ body {
 .topnav {
   overflow: hidden;
   background-color: #333;
-  padding: 0;
+  padding: 0 56px;
 }
 
 .topnav a {
@@ -26,6 +26,10 @@ body {
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
+}
+
+a.name {
+  padding-left: 0;
 }
 
 .topnav a:not(.name):hover {
@@ -45,9 +49,19 @@ body {
   display: none;
 }
 
-@media screen and (max-width: 800px) {
+/* nav margin on wide */ 
+@media only screen and (min-width: 1000px) {
+  .topnav {
+    padding: 0 6%;
+  }
+}
+
+/* hamburger */
+@media screen and (max-width: 900px) {
   /* make tabs disappear, show hamburger */
-  .topnav a:not(.name) {display: none;}
+  .topnav a:not(.name) {
+    display: none;
+  }
   .topnav a.icon {
     float: right;
     display: block;
@@ -152,18 +166,51 @@ body {
   width: contain
 }
 
-.subhead-contact {
+.resume-contact {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+}
+
+.resume-contact * {
+  margin: 0 10px 0 0;
+}
+
+.subhead-resume, .subhead-contact {
   font-size: 16px;
+  font-weight: 600;
   font-family: 'Museosans 700', 'Poppins', sans-serif;
   padding: 14px 26px;
   border-radius: 8px;
-  background-color: rgb(51, 63, 159);
-  color: white;
-  font-weight: 600;
   text-decoration: none;
   box-sizing: border-box;
   height: 50px;
   width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border: 2px solid var(--blue);
+}
+
+.subhead-resume {
+  background-color: var(--blue);
+  color: var(--light-grey);
+}
+
+.subhead-contact {
+  background-color: var(--light-grey);
+  color: var(--blue);
+}
+
+.subhead-resume:hover {
+  background-color: var(--light-grey);
+  color: var(--blue);
+}
+
+.subhead-contact:hover {
+  background-color: var(--blue);
+  color: var(--light-grey);
 }
 
 @media only screen and (max-width: 800px) {
@@ -185,20 +232,20 @@ body {
     height: 100%;
     max-height: 300px;
   }
+  .header > * {
+    margin: 0 40px !important;
+  }
 }
 
+
+/* put "JHU" on new line on wide */ 
 @media screen and (min-width: 1200px) {
   .jhu-span {
     display: block;
   }
 }
 
-@media screen and (max-width: 600px) {
-  .header-text {
-    margin: 0 20px 0 40px;
-  }
-}
-
+/* remove background avatar, adjust text sizing above fold */
 @media screen and (max-width: 500px) {
   .mobile-avatar {
     display: none !important;
@@ -208,6 +255,14 @@ body {
   }
   .subhead-big {
     font-size: 24px;
+  }
+  .resume-contact {
+    flex-direction: column;
+    width: 100%;
+  }
+  .resume-contact * {
+    margin: 0 0 10px 0;
+    width: 100%;
   }
 }
 
@@ -220,7 +275,7 @@ body {
 /* SECTIONS */
 
 .section {
-  padding: 40px 85px 0 85px;
+  padding: 40px 6% 0 6%;
 }
 
 /* TESTIMONIALS */
@@ -404,6 +459,9 @@ body {
   .featured-call-container {
     margin: 0 auto;
   }
+  .section h2 {
+    margin-left: 20px;
+  }
 }
 
 /* change featured projects buttons to be 100% width and centered */
@@ -418,5 +476,3 @@ body {
     text-align: center;
   }
 }
-
-
