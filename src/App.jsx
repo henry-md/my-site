@@ -12,16 +12,37 @@ import './App.css'
 import 'swiper/css';
 
 function App() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const handleSend = () => {
+    const mailtoLink = `mailto:henrymdeutsch@gmail.com?subject=Message from ${name}&body=${message}`;
+    window.location.href = mailtoLink;
+  };
+
   return (
     <>
     {/* start navigation bar */}
     <div className="topnav" id="myTopnav">
       <a href="#home" className="name">Henry Magnus Deutsch</a>
       <div className="horizontal-tabs">
-        <a href="#experience">Experience</a>
-        <a href="#skills">Skills</a>
+        <a href="#experience" onClick={smoothScroll}>Experience</a>
+        <a href="#skills" onClick={smoothScroll}>Skills</a>
         <a href="#testimonials" onClick={smoothScroll}>Testimonials</a>
-        <a href="#featured">Featured Projects</a>
+        <a href="#featured" onClick={smoothScroll}>Featured Projects</a>
       </div>
 
       <a href="javascript:void(0);" className="icon" onClick={toggle}>
@@ -44,7 +65,7 @@ function App() {
             </div>
             <div className="resume-contact">
               <a className="subhead-resume" href={Resume} download>Download Resume</a>
-              <a className="subhead-contact">Get in Touch</a>
+              <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get in Touch</a>
             </div>
             <img
               className="mobile-avatar avatar"
@@ -69,7 +90,7 @@ function App() {
       </div>
 
       {/* start featured projects section */}
-      <div className="projects section">
+      <div className="projects section" id="featured">
         <h2>Featured Projects</h2>
         {/* <p>A lot of the projects I make, including the ChessHelper and TypingHelper projects, I make because I want a website to exist that doesn't. </p> */}
         <FeaturedProject
@@ -113,6 +134,20 @@ function App() {
           secondCallToActionLink="https://github.com/henry-md/Typing-Helper"
         />
 
+      </div>
+
+      {/* start contact section */}
+      <div className="contact section" id="contact">
+        <div className="contact-form">
+          <h2>Contact Me</h2>
+          <div className='name-email'>
+            <input className="reg-text" type="text" placeholder="Name" value={name} onChange={handleNameChange} />
+            <input className="reg-text" type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
+          </div>
+          <textarea className="reg-text" placeholder="Message" value={message} onChange={handleMessageChange} style={{ resize: "none" }} />
+          <button className="submit dark-button reg-text" onClick={handleSend}>Submit</button>
+          
+        </div>
       </div>
     </div>
     </>
