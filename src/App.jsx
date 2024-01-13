@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import Experience from './components/Experience.jsx'
 import TestimonialSwiper from './components/TestimonialSwiper.jsx'
 import FeaturedProject from './components/FeaturedProject.jsx'
+import ContactForm from './components/ContactForm.jsx'
 import { toggle, smoothScroll } from './utils/general.js';
 import VincentDemo from './assets/vincent-dunn-demo.mov'
 import CheckItOutDemo from './assets/checkitout-demo.mov'
@@ -12,26 +14,6 @@ import './App.css'
 import 'swiper/css';
 
 function App() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-
-  const handleNameChange = (e) => {
-    setName(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-  };
-
-  const handleSend = () => {
-    const mailtoLink = `mailto:henrymdeutsch@gmail.com?subject=Message from ${name}&body=${message}`;
-    window.location.href = mailtoLink;
-  };
 
   return (
     <>
@@ -80,6 +62,14 @@ function App() {
               className="avatar"
             />
           </div>
+        </div>
+      </div>
+
+      {/* start experience section */}
+      <div className="experience section" id="testimonials">
+        <h2>What I do</h2>
+        <div className="exieriences">
+          <Experience />
         </div>
       </div>
 
@@ -138,16 +128,7 @@ function App() {
 
       {/* start contact section */}
       <div className="contact section" id="contact">
-        <div className="contact-form">
-          <h2>Contact Me</h2>
-          <div className='name-email'>
-            <input className="reg-text" type="text" placeholder="Name" value={name} onChange={handleNameChange} />
-            <input className="reg-text" type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
-          </div>
-          <textarea className="reg-text" placeholder="Message" value={message} onChange={handleMessageChange} style={{ resize: "none" }} />
-          <button className="submit dark-button reg-text" onClick={handleSend}>Submit</button>
-          
-        </div>
+        <ContactForm />
       </div>
     </div>
     </>

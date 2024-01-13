@@ -24,6 +24,7 @@ body, .reg-text {
 }
 
 .dark-button, .light-button {
+  font-size: 16px !important;
   border: 2px solid var(--blue);
   text-decoration: none;
   padding: 10px 50px;
@@ -58,6 +59,9 @@ body, .reg-text {
   overflow: hidden;
   background-color: #333;
   padding: 0 56px;
+  /* position: sticky;
+  top: 0; */
+  z-index: 999;
 }
 
 .topnav a {
@@ -73,12 +77,6 @@ body, .reg-text {
 a.name {
   padding-left: 0;
 }
-
-.topnav a:not(.name):hover {
-  background-color: #ddd;
-  color: black;
-}
-
 
 .horizontal-tabs {
   float: right;
@@ -98,8 +96,23 @@ a.name {
   }
 }
 
+/* only highlight boxes on wide */
+@media screen and (min-width: 900px) {
+  .topnav a:not(.name):hover {
+    background-color: #ddd;
+    color: black;
+  }
+}
+
 /* hamburger */
 @media screen and (max-width: 900px) {
+
+  /* make nav sticky */
+  /* .topnav {
+    position: sticky;
+    top: 0;
+  } */
+
   /* make tabs disappear, show hamburger */
   .topnav a:not(.name) {
     display: none;
@@ -110,7 +123,9 @@ a.name {
   }
 
   /* make hamburger work */
-  .topnav.responsive {position: relative;}
+  .topnav.responsive {
+    transition: all 0.3s ease !important;
+  }
   .topnav.responsive .name {
     display: none;
   }
@@ -200,6 +215,7 @@ a.name {
   background: linear-gradient(to right, #f32170, #ff6b08,#3845ff);
   background: linear-gradient(to right, #f32170,rgb(51, 63, 159) 90%);
   background: linear-gradient(to right, rgb(45, 39, 243), rgb(233, 52, 94) 90%);
+  background: linear-gradient(to right, var(--blue) 10%, rgb(233, 52, 94) 90%);
   -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
@@ -315,6 +331,14 @@ a.name {
   }
 }
 
+/* name-email in contact section needs to become column a little earlier */
+@media screen and (max-width: 600px) {
+  div.name-email {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
 @media screen and (max-width: 350px) {
   .subhead-rainbow {
     font-size: 30px;
@@ -344,6 +368,7 @@ a.name {
 
 .swiper-slide {
   background-color: var(--light-grey);
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
   border-radius: 10px;
   padding: 25px 16px;
   box-sizing: border-box;
@@ -413,6 +438,7 @@ a.name {
 .featured-project {
   padding: 20px;
   border-radius: 10px;
+  background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: row;
@@ -518,13 +544,13 @@ a.name {
   align-items: center;
 }
 
-.contact-form input:focus,
-.contact-form textarea:focus {
+.form-container input:focus,
+.form-container textarea:focus {
   border: 2px solid var(--blue);
   outline: none;
 }
 
-.contact-form {
+.form-container {
   width: 90%;
   max-width: 600px;
   box-sizing: border-box;
@@ -535,8 +561,9 @@ a.name {
   gap: 20px;
 }
 
-.contact-form * {
+.form-container * {
   flex-grow: 1;
+  flex-shrink: 1;
 }
 
 .name-email {
@@ -548,4 +575,10 @@ a.name {
 
 .submit {
   width: fit-content;
+}
+
+.form-container h2 {
+  /* still allow for media queries to change left margin */
+  margin-top: 0;
+  margin-bottom: 0;
 }
