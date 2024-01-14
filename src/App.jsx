@@ -9,6 +9,7 @@ import CheckItOutDemo from './assets/checkitout-demo.mov'
 import ChessHelperDemo from './assets/chess-helper-demo.mov'
 import TypingHelperDemo from './assets/typing-helper-demo.mov'
 import Resume from './assets/HenryDeutschResume.pdf'
+import FancyHeadshot from './assets/headshot_fancy.png'
 
 import './App.css'
 import 'swiper/css';
@@ -51,13 +52,13 @@ function App() {
             </div>
             <img
               className="mobile-avatar avatar"
-              src="https://www.w3schools.com/howto/img_avatar.png"
+              src={FancyHeadshot}
               alt="Avatar"
             />
           </div>
           <div className="header-image">
             <img
-              src="https://www.w3schools.com/howto/img_avatar.png"
+              src={FancyHeadshot}
               alt="Avatar"
               className="avatar"
             />
@@ -66,12 +67,12 @@ function App() {
       </div>
 
       {/* start experience section */}
-      <div className="experience section" id="testimonials">
+      {/* <div className="experience section" id="testimonials">
         <h2>What I do</h2>
         <div className="exieriences">
           <Experience />
         </div>
-      </div>
+      </div> */}
 
       {/* start testimonials section */}
       <div className="testimonials section" id="testimonials">
