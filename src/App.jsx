@@ -16,7 +16,7 @@ import ChessHelperPoster from './assets/chess-helper-poster.png'
 import TypingHelperPoster from './assets/typing-helper-poster.png'
 
 import Resume from './assets/HenryDeutschResume.pdf'
-import FancyHeadshot from './assets/headshot_fancy.png'
+import FancyHeadshot from './assets/headshot_fancy_small.png'
 
 import './App.css'
 import 'swiper/css';

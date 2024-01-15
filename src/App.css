@@ -17,6 +17,21 @@ body, .reg-text {
   }
 }
 
+img.avatar {
+  animation: slideIn 1s ease-in-out;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 50%;
+    transform: translateX(30px);
+  }
+  100% {
+    opacity: 100%;
+    transform: translateX(0);
+  }
+}
+
 .sub-head {
   font-size: 18px;
   font-weight: 600;
