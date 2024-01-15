@@ -4,10 +4,17 @@ import TestimonialSwiper from './components/TestimonialSwiper.jsx'
 import FeaturedProject from './components/FeaturedProject.jsx'
 import ContactForm from './components/ContactForm.jsx'
 import { toggle, smoothScroll } from './utils/general.js';
+
 import VincentDemo from './assets/vincent-dunn-demo.mov'
 import CheckItOutDemo from './assets/checkitout-demo.mov'
 import ChessHelperDemo from './assets/chess-helper-demo.mov'
 import TypingHelperDemo from './assets/typing-helper-demo.mov'
+
+import VincentPoster from './assets/vincent-dunn-poster.png'
+import CheckItOutPoster from './assets/checkitout-poster.png'
+import ChessHelperPoster from './assets/chess-helper-poster.png'
+import TypingHelperPoster from './assets/typing-helper-poster.png'
+
 import Resume from './assets/HenryDeutschResume.pdf'
 import FancyHeadshot from './assets/headshot_fancy.png'
 
@@ -47,8 +54,8 @@ function App() {
               <p className="subhead-rainbow">Hi, I'm Henry</p>
             </div>
             <div className="resume-contact">
-              <a className="subhead-resume" href={Resume} download>Download Resume</a>
-              <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get in Touch</a>
+              <a className="subhead-resume" href={Resume} download>Download&nbsp;Resume</a>
+              <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get&nbsp;in&nbsp;Touch</a>
             </div>
             <img
               className="mobile-avatar avatar"
@@ -86,6 +93,7 @@ function App() {
         {/* <p>A lot of the projects I make, including the ChessHelper and TypingHelper projects, I make because I want a website to exist that doesn't. </p> */}
         <FeaturedProject
           src={VincentDemo}
+          poster={VincentPoster}
           alt="Vincent Dunn website demo"
           title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
           description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace,” into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
@@ -96,6 +104,7 @@ function App() {
         />
         <FeaturedProject
           src={CheckItOutDemo}
+          poster={CheckItOutPoster}
           alt="Check It Out project demo"
           title="CheckItOut: Computer Vision Powered Solution to Checkout"
           description="Made a physical checkout counter with an integrated scale, overhead camera, and processing unit performing automatic detection and classification of grocery items. Lightweight classifier and detector using MobileNetV2, with robust accuracy."
@@ -106,6 +115,7 @@ function App() {
         />
         <FeaturedProject
           src={ChessHelperDemo}
+          poster={ChessHelperPoster}
           alt="Chess Helper project demo"
           title="ChessHelper: An Interactive Way to Practice Chess Theory"
           description="Understanding and memorizing chess theory is absolutely essential to becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
@@ -116,6 +126,7 @@ function App() {
         />
         <FeaturedProject
           src={TypingHelperDemo}
+          poster={TypingHelperPoster}
           alt="Typing helper project demo"
           title="TypingHelper: Improve Special Character Typing Speed"
           description="Generates typing test heavy in special characters to help with typing speed when coding. You can programatically control variables like the method used to generate the typing test, length of the test, and concentration of special characters."
@@ -130,6 +141,9 @@ function App() {
       {/* start contact section */}
       <div className="contact section" id="contact">
         <ContactForm />
+      </div>
+      <div className='copyright'>
+        © {new Date().getFullYear()} Henry Magnus Deutsch
       </div>
     </div>
     </>

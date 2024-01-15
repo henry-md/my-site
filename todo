@@ -1,11 +1,13 @@
 
-- what I do section
-  - consider printing emailers sideways and taking screenshot like that
 
+Good to do
 - add stuff to bottom: link to github, linkedin
-- "Copyright Henry Deutsch"
-
 - animate above the fold stuff like reference site
 - animate featured projects to make them fade in (like your CheckItOut website)
 - make "Hi, I'm Henry" change background gradients like reference
-- consider making navbar white like reference
+- hard code above the fold to be 100% of vh. Would involve coding padding of tabs in terms of vh, etc.
+- make message increase in height as they type
+
+Maybe later
+- what I do section
+  - consider printing emailers sideways and taking screenshot like that
