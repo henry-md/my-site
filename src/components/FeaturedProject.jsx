@@ -5,7 +5,7 @@ class FeaturedProject extends React.Component {
 
   render() {
     return (
-      <div className="featured-project">
+      <div className="featured-project fade-up">
         <video className="featured-video" autoPlay loop poster={this.props.poster}>
           <source src={this.props.src} type="video/quicktime"></source>
         </video>

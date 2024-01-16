@@ -17,11 +17,14 @@ body, .reg-text {
   }
 }
 
-img.avatar {
-  animation: slideIn 1s ease-in-out;
+.fade-left {
+  animation: fade-left 1s ease-in-out;
+}
+.fade-up {
+  animation: fade-up 1s ease-in-out;
 }
 
-@keyframes slideIn {
+@keyframes fade-left {
   0% {
     opacity: 50%;
     transform: translateX(30px);
@@ -30,6 +33,18 @@ img.avatar {
     opacity: 100%;
     transform: translateX(0);
   }
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 50%;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 100%;
+    transform: translateY(0);
+  }
+
 }
 
 .sub-head {

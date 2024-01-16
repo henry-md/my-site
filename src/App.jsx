@@ -21,6 +21,25 @@ import FancyHeadshot from './assets/headshot_fancy_small.png'
 import './App.css'
 import 'swiper/css';
 
+function FadeInSection(props) {
+  const [isVisible, setVisible] = React.useState(false);
+  const domRef = React.useRef();
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => setVisible(entry.isIntersecting));
+    });
+    observer.observe(domRef.current);
+  }, []);
+  return (
+    <div
+      className={`fade-in-section ${isVisible ? 'is-visible' : ''}`}
+      ref={domRef}
+    >
+      {props.children}
+    </div>
+  );
+}
+
 function App() {
 
   return (
@@ -67,7 +86,7 @@ function App() {
             <img
               src={FancyHeadshot}
               alt="Avatar"
-              className="avatar"
+              className="avatar fade-left"
             />
           </div>
         </div>
@@ -98,9 +117,9 @@ function App() {
           title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
           description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace,” into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
           callToAction="View Project"
-          callToActionLink="https://henry-md.github.io/ChessHelper/"
+          callToActionLink="https://henry-md.github.io/Vincent-Dunn-Book/"
           secondCallToAction="View Github"
-          secondCallToActionLink="https://github.com/henry-md/ChessHelper"
+          secondCallToActionLink="https://github.com/henry-md/Vincent-Dunn-Book"
         />
         <FeaturedProject
           src={CheckItOutDemo}
