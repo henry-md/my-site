@@ -65,7 +65,7 @@ function ContactForm() {
           errors={state.errors}
         />
 
-        <button type="submit" class="dark-button submit" disabled={state.submitting}>
+        <button type="submit" className="dark-button submit" disabled={state.submitting}>
           Send
         </button>
       </div>
