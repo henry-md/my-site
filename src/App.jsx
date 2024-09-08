@@ -1,8 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-
-import { useState } from 'react'
-import Experience from './components/Experience.jsx'
 import TestimonialSwiper from './components/TestimonialSwiper.jsx'
 import FeaturedProject from './components/FeaturedProject.jsx'
 import ContactForm from './components/ContactForm.jsx'
@@ -73,10 +69,10 @@ function App() {
               Software developer studying at <span className="jhu-span">Johns Hopkins University</span>
             </p>
             <div>
-              <p className="subhead-rainbow">Hi, I'm Henry</p>
+              <p className="subhead-rainbow">Hi, I&apos;m Henry</p>
             </div>
             <div className="resume-contact">
-              <a className="subhead-resume" href={Resume} target="_blank">View&nbsp;Resume</a>
+              <a className="subhead-resume" href={Resume} target="_blank" rel="noreferrer">View&nbsp;Resume</a>
               <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get&nbsp;in&nbsp;Touch</a>
             </div>
             <img

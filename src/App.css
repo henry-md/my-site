@@ -245,10 +245,6 @@ a.name {
   width: 100%;
 }
 
-.avatar {
-  border-radius: 5px;
-}
-
 .subhead-small {
   font-size: 18px;
   font-weight: 400;
@@ -443,8 +439,10 @@ a.name {
   min-width: 75px;
   height: 75px;
   object-fit: cover;
-  object-position: 0 10%;
   border-radius: 50%;
+}
+.avatar.vincent {
+  object-position: 0 10%;
 }
 
 .name-title {
