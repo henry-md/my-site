@@ -269,7 +269,7 @@ a.name {
   background: linear-gradient(to right, rgb(45, 39, 243), rgb(233, 52, 94) 90%); */
   background: linear-gradient(to right, var(--blue) 10%, rgb(233, 52, 94) 90%);
   background: linear-gradient(
-        90deg,
+        45deg,
         #ff0000, #0000ff, #ff0000, #0000ff
       );
   background-size: 300% 100%;
