@@ -1,10 +1,12 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination } from 'swiper/modules';
 import vincent from '../assets/vincent-dunn.jpeg';
 import logan from '../assets/logan-ye.png';
 import james from '../assets/james-butler.jpeg';
 import quote from '../assets/quote.jpeg';
 import 'swiper/css';
+import 'swiper/css/pagination';
 
 class TestimonialSwiper extends React.Component {
   constructor(props) {
@@ -29,6 +31,7 @@ class TestimonialSwiper extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.updateSlidesPerView);
+    window.addEventListener('load', this.setupTestimonials);
 
     // deal with testimonials overflow
     this.setupTestimonials();
@@ -45,18 +48,18 @@ class TestimonialSwiper extends React.Component {
       button.removeEventListener('click', button.toggleTextHandler);
       
       // Check if content overflows
-      if (content.scrollHeight > content.clientHeight) {
+      if (content.scrollHeight > 480) { // [Ref 1] - should match what's in App.css
+        console.log('overflow');
         button.classList.add('visible');
         // Create a new handler and store it on the button element
         button.toggleTextHandler = () => this.toggleText(container, button, content);
         button.addEventListener('click', button.toggleTextHandler);
         content.classList.add('gradient-hide');
       } else {
-        // Remove gradient if content doesn't overflow
-        // content.classList.remove('gradient-hide');
-        button.classList.remove('visible');
         console.log('no overflow');
-        content.style.maxHeight = 'none';
+        // Remove gradient if content doesn't overflow
+        content.classList.remove('gradient-hide');
+        button.classList.remove('visible');
       }
     });
   };
@@ -95,6 +98,8 @@ class TestimonialSwiper extends React.Component {
         onSlideChange={() => console.log('slide change')}
         onSwiper={(swiper) => console.log(swiper)}
         loop={true}
+        pagination={{ clickable: true }}
+        modules={[Pagination]}
       >
         <SwiperSlide>
           <div className="quote-content">
@@ -144,10 +149,15 @@ class TestimonialSwiper extends React.Component {
               src={quote}
               alt="Close Quote"
             />
-            <p>Henry was a standout member of our team this summer where he worked on the development of KnoWhiz, an application that had both front and backend challenges.</p>
-            <p>Henry demonstrated an exceptional ability to handle complex tasks and deliver high-quality results. His contributions in leading the development of the explore page, helping implement course generation from wikipedia and youtube links, etc. were critical to the timely launch of the 1.1v of our app.</p>
-            <p>Beyond his technical skills, he was a pleasure to have on the team, and regularly took the initiative to mentor other interns, sharing his knowledge and helping to resolve issues as they arose.</p>
-            <p>I have no doubt that Henry will continue to excel in his future endeavors, and I highly recommend him for any role that he chooses to pursue. He would be an invaluable asset to any team.</p>
+            <div className="expandable-container">
+              <div className="expandable-content">
+                <p>Henry was a standout member of our team this summer where he worked on the development of KnoWhiz, an application that had both front and backend challenges.</p>
+                <p>Henry demonstrated an exceptional ability to handle complex tasks and deliver high-quality results. His contributions in leading the development of the explore page, helping implement course generation from wikipedia and youtube links, etc. were critical to the timely launch of the 1.1v of our app.</p>
+                <p>Beyond his technical skills, he was a pleasure to have on the team, and regularly took the initiative to mentor other interns, sharing his knowledge and helping to resolve issues as they arose.</p>
+                <p>I have no doubt that Henry will continue to excel in his future endeavors, and I highly recommend him for any role that he chooses to pursue. He would be an invaluable asset to any team.</p>
+              </div>
+              <button className="toggle-see-more-btn">See More</button>
+            </div>
           </div>
           <div className="tab-footer">
             <img
@@ -173,22 +183,13 @@ class TestimonialSwiper extends React.Component {
               src={quote}
               alt="Close Quote"
             />
-            <p>
-              I&apos;ve had the pleasure of working with Henry to develop my
-              website, and have been consistently impressed by his ability
-              to ask the right questions, and deliver on software that fits
-              the particular needs of the situation. In all of the projects
-              we&apos;ve worked on together he&apos;s kept great communication, and
-              made my role stress-free. After completely re-doing my site
-              and enhancing SEO my online book sales increased by 50%.
-            </p>
-            <p>
-              Henry has a rare combination of technical proficiency and
-              creative insight. In our work together he&apos;s encouraged me to
-              rethink aspects of the UI (User Interface) both in terms of function and
-              aesthetics, and in the end it created a better user
-              experience. I give Henry my whole-hearted recommendation.
-            </p>
+            <div className="expandable-container">
+              <div className="expandable-content">
+                <p>I&apos;ve had the pleasure of working with Henry to develop my website, and have been consistently impressed by his ability to ask the right questions, and deliver on software that fits the particular needs of the situation. In all of the projects we&apos;ve worked on together he&apos;s kept great communication, and made my role stress-free. After completely re-doing my site and enhancing SEO my online book sales increased by 50%.</p>
+                <p>Henry has a rare combination of technical proficiency and creative insight. In our work together he&apos;s encouraged me to rethink aspects of the UI (User Interface) both in terms of function and aesthetics, and in the end it created a better user experience. I give Henry my whole-hearted recommendation.</p>
+              </div>
+              <button className="toggle-see-more-btn">See More</button>
+            </div>
           </div>
           <div className="tab-footer">
             <img

@@ -1,6 +1,7 @@
 :root {
   --dark-grey: rgba(0, 0, 0, 0.8);
   --blue: rgb(51, 63, 159);
+  --text-blue: rgb(52, 59, 165);
   --blue-hover: rgb(51, 63, 159, 0.8);
   --white-hover: rgba(219, 219, 219, 0.8);
   --light-grey: rgb(245, 245, 245); /* rgb(245, 245, 245); */
@@ -253,7 +254,7 @@ a.name {
 .subhead-big {
   font-size: 32px;
   font-weight: 200;
-  color: rgb(52, 59, 165);
+  color: var(--text-blue);
   margin: 0;
 }
 
@@ -496,9 +497,12 @@ a.name {
 }
 
 .expandable-content {
+  padding: 0;
+  margin: 0;
   max-height: 480px; /* [Ref 1] should match what's in TestimonialSwiper.jsx */
   overflow: hidden;
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .expandable-content.gradient-hide::after {
@@ -525,20 +529,36 @@ button.toggle-see-more-btn {
   font-size: 16px;
   display: none; /* Hide button by default */
   margin-top: 10px;
-  padding: 5px 10px;
-  background-color: rgba(45, 63, 112, 0.8);
+  height: 40px;
+  width: 100px;
+  background-color: rgba(51, 63, 159, 0.8); /* rgba(45, 63, 112, 0.8) */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
 }
 
 button.toggle-see-more-btn.visible {
-  display: block; /* Show button when it has 'visible' class */
+  display: flex; /* Show button when it has 'visible' class */
 }
 
 button.toggle-see-more-btn:hover {
-  background-color: rgba(45, 63, 112, 1);
+  /* background-color: rgba(45, 63, 112, 1); */
+  background-color: var(--light-grey);
+  color: rgba(45, 63, 112, 0.8);
+  border: 2px solid rgba(45, 63, 112, 0.8);
+}
+
+/* changing built-in pagination swiper styles */
+.swiper-initialized {
+  overflow: visible;
+}
+.swiper-pagination-bullets {
+  bottom: -50px !important;
 }
 
 
