@@ -21,7 +21,7 @@ class TestimonialSwiper extends React.Component {
     if (container.classList.contains('expanded')) {
       container.classList.remove('expanded');
       button.textContent = 'See More';
-      content.style.maxHeight = '480px'; // [Ref 1] Should match what's in App.css
+      content.style.maxHeight = '460px'; // [Ref 1] Should match what's in App.css
     } else {
       container.classList.add('expanded');
       button.textContent = 'See Less';
@@ -48,15 +48,13 @@ class TestimonialSwiper extends React.Component {
       button.removeEventListener('click', button.toggleTextHandler);
       
       // Check if content overflows
-      if (content.scrollHeight > 480) { // [Ref 1] - should match what's in App.css
-        console.log('overflow');
+      if (content.scrollHeight > 460) { // [Ref 1] - should match what's in App.css
         button.classList.add('visible');
         // Create a new handler and store it on the button element
         button.toggleTextHandler = () => this.toggleText(container, button, content);
         button.addEventListener('click', button.toggleTextHandler);
         content.classList.add('gradient-hide');
       } else {
-        console.log('no overflow');
         // Remove gradient if content doesn't overflow
         content.classList.remove('gradient-hide');
         button.classList.remove('visible');

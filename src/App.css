@@ -424,7 +424,7 @@ a.name {
   background-color: var(--light-grey);
   /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
   border-radius: 10px;
-  padding: 25px 16px;
+  padding: 45px 26px;
   box-sizing: border-box;
 }
 
@@ -476,17 +476,19 @@ a.name {
 
 .open-quote {
   /* flip around the horizontal axis */
+  position: absolute;
   transform: rotateX(180deg);
   top: -23px;
-  left: 3px;
+  left: -5px;
   background-color: transparent !important;
 }
 
 .close-quote {
   /* flip around the vertical axis */
   transform: rotateY(180deg);
-  bottom: 0;
-  right: 10px;
+  bottom: -23px;
+  right: -5px;
+  z-index: 1;
 }
 
 /* dealing with testimonials overflow */
@@ -499,7 +501,7 @@ a.name {
 .expandable-content {
   padding: 0;
   margin: 0;
-  max-height: 480px; /* [Ref 1] should match what's in TestimonialSwiper.jsx */
+  max-height: 460px; /* [Ref 1] should match what's in TestimonialSwiper.jsx */
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
@@ -530,7 +532,7 @@ button.toggle-see-more-btn {
   display: none; /* Hide button by default */
   margin-top: 10px;
   height: 40px;
-  width: 100px;
+  width: 110px;
   background-color: rgba(51, 63, 159, 0.8); /* rgba(45, 63, 112, 0.8) */
   color: white;
   border: none;
@@ -549,16 +551,19 @@ button.toggle-see-more-btn.visible {
 button.toggle-see-more-btn:hover {
   /* background-color: rgba(45, 63, 112, 1); */
   background-color: var(--light-grey);
-  color: rgba(45, 63, 112, 0.8);
+  color: rgba(45, 63, 112, 0.8); /* actually matches the blue text more than background color of un-hover */
   border: 2px solid rgba(45, 63, 112, 0.8);
 }
 
-/* changing built-in pagination swiper styles */
-.swiper-initialized {
-  overflow: visible;
+/* overriding built-in pagination swiper styles */
+.swiper-wrapper {
+  padding-bottom: 40px;
 }
 .swiper-pagination-bullets {
-  bottom: -50px !important;
+  bottom: 0px !important;
+}
+.swiper-pagination-bullet-active {
+  background-color: rgba(45, 63, 112, 0.8);
 }
 
 
