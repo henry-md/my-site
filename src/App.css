@@ -488,6 +488,60 @@ a.name {
   right: 10px;
 }
 
+/* dealing with testimonials overflow */
+.expandable-container {
+  padding: 0;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.expandable-content {
+  max-height: 480px; /* [Ref 1] should match what's in TestimonialSwiper.jsx */
+  overflow: hidden;
+  position: relative;
+}
+
+.expandable-content.gradient-hide::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(transparent, var(--light-grey));
+}
+
+.expanded .expandable-content {
+  /* height: auto; */
+  max-height: none;
+}
+
+.expanded .expandable-content::after {
+  display: none;
+}
+
+button.toggle-see-more-btn {
+  margin: 0 auto;
+  font-size: 16px;
+  display: none; /* Hide button by default */
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: rgba(45, 63, 112, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.toggle-see-more-btn.visible {
+  display: block; /* Show button when it has 'visible' class */
+}
+
+button.toggle-see-more-btn:hover {
+  background-color: rgba(45, 63, 112, 1);
+}
+
+
 /* FEATURED PROJECTS */
 
 .featured-project {
