@@ -264,16 +264,32 @@ a.name {
 .subhead-rainbow {
   font-size: 60px;
   font-weight: 700;
-  background: linear-gradient(to right, #f32170, #ff6b08,#3845ff);
+  /* background: linear-gradient(to right, #f32170, #ff6b08,#3845ff);
   background: linear-gradient(to right, #f32170,rgb(51, 63, 159) 90%);
-  background: linear-gradient(to right, rgb(45, 39, 243), rgb(233, 52, 94) 90%);
+  background: linear-gradient(to right, rgb(45, 39, 243), rgb(233, 52, 94) 90%); */
   background: linear-gradient(to right, var(--blue) 10%, rgb(233, 52, 94) 90%);
+  background: linear-gradient(
+        90deg,
+        #ff0000, #0000ff, #ff0000, #0000ff
+      );
+  background-size: 300% 100%;
+  color: transparent;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
   margin: 10px 0 30px 0;
   display: inline-block; 
-  width: contain
+  width: contain;
+  animation: rainbow 8s linear infinite;
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
 .resume-contact {
