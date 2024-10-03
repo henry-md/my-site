@@ -16,6 +16,9 @@ body, .reg-text {
   body, .reg-text {
     font-size: 14px;
   }
+  .header-text, .header-text * {
+    text-align: center !important;
+  }
 }
 
 .fade-left {
