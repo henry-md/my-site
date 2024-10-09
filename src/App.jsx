@@ -47,10 +47,9 @@ function App() {
     <div className="topnav" id="myTopnav">
       <a href="#home" className="name">Henry Magnus Deutsch</a>
       <div className="horizontal-tabs">
-        <a href="#experience" onClick={smoothScroll}>Experience</a>
-        <a href="#skills" onClick={smoothScroll}>Skills</a>
         <a href="#testimonials" onClick={smoothScroll}>Testimonials</a>
         <a href="#featured" onClick={smoothScroll}>Featured Projects</a>
+        <a href="#contact" onClick={smoothScroll}>Contact</a>
       </div>
 
       <a href="javascript:void(0);" className="icon" onClick={toggle}>
