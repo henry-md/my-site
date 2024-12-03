@@ -3,6 +3,7 @@ import TestimonialSwiper from './components/TestimonialSwiper.jsx'
 import FeaturedProject from './components/FeaturedProject.jsx'
 import ContactForm from './components/ContactForm.jsx'
 import { toggle, smoothScroll } from './utils/general.js';
+import PropTypes from 'prop-types';
 
 import VincentDemo from './assets/vincent-dunn-demo.mov'
 import CheckItOutDemo from './assets/checkitout-demo.mov'
@@ -38,6 +39,10 @@ function FadeInSection(props) {
     </div>
   );
 }
+
+FadeInSection.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 function App() {
 
