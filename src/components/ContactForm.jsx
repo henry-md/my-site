@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 
 // Make sure to run npm install @formspree/react
@@ -13,7 +12,7 @@ function ContactForm() {
   const handleSubmitWithCallback = async (event) => {
     event.preventDefault();
     try {
-      const result = await handleSubmit(event);
+      await handleSubmit(event);
       window.location.href = "https://formspree.io/thanks?language=en";
     } catch (error) {
       console.error('Error submitting form:', error);
