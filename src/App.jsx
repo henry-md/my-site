@@ -105,7 +105,7 @@ function App() {
 
       {/* start testimonials section */}
       <div className="testimonials section" id="testimonials">
-        <h2>Testiminials</h2>
+        <h2>Testimonials</h2>
         <TestimonialSwiper />
       </div>
 
