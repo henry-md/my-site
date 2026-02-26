@@ -9,11 +9,14 @@ import VincentDemo from './assets/vincent-dunn-demo.mov'
 import CheckItOutDemo from './assets/checkitout-demo.mov'
 import ChessHelperDemo from './assets/chess-helper-demo.mov'
 import TypingHelperDemo from './assets/typing-helper-demo.mov'
+import IntentionSetterDemo from './assets/intention-setter-demo.mov'
 
 import VincentPoster from './assets/vincent-dunn-poster.png'
 import CheckItOutPoster from './assets/checkitout-poster.png'
 import ChessHelperPoster from './assets/chess-helper-poster.png'
 import TypingHelperPoster from './assets/typing-helper-poster.png'
+import IntentionSetterPoster from './assets/intention-setter-poster.png'
+
 import Resume from './assets/HenryDeutschResume.pdf'
 import FancyHeadshot from './assets/headshot_fancy_small.png'
 
@@ -111,38 +114,11 @@ function App() {
 
       {/* start featured projects section */}
       <div className="projects section" id="featured">
-        <h2>Featured Projects</h2>
+        <h2>Things I&apos;ve made</h2>
         {/* <p>A lot of the projects I make, including the ChessHelper and TypingHelper projects, I make because I want a website to exist that doesn't. </p> */}
         
-        <FadeInSection key={'1'}>
-          <FeaturedProject
-            src={VincentDemo}
-            poster={VincentPoster}
-            alt="Vincent Dunn website demo"
-            title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
-            description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace,” into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
-            callToAction="View Project"
-            callToActionLink="https://henry-md.github.io/Vincent-Dunn-Book/"
-            secondCallToAction="View Github"
-            secondCallToActionLink="https://github.com/henry-md/Vincent-Dunn-Book"
-          />
-        </FadeInSection>
-        
-        <FadeInSection key={'2'}>
-          <FeaturedProject
-            src={CheckItOutDemo}
-            poster={CheckItOutPoster}
-            alt="Check It Out project demo"
-            title="CheckItOut: Computer Vision Powered Solution to Checkout"
-            description="Made a physical checkout counter with an integrated scale, overhead camera, and processing unit performing automatic detection and classification of grocery items. Lightweight classifier and detector using MobileNetV2, with robust accuracy."
-            callToAction="View Website"
-            callToActionLink="https://henry-md.github.io/CheckItOut/"
-            secondCallToAction="View Devpost"
-            secondCallToActionLink="https://devpost.com/software/check-it-out"
-          />
-        </FadeInSection>
-        
-        <FadeInSection key={'3'}>
+        {/* Chess Helper */}
+        <FadeInSection key={'0'}>
           <FeaturedProject
             src={ChessHelperDemo}
             poster={ChessHelperPoster}
@@ -150,23 +126,50 @@ function App() {
             title="ChessHelper: An Interactive Way to Practice Chess Theory"
             description="Understanding and memorizing chess theory is absolutely essential to becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
             callToAction="View Project"
-            callToActionLink="https://henry-md.github.io/ChessHelper/"
+            callToActionLink="https://chess-helper-frontend-production.up.railway.app/"
             secondCallToAction="View Github"
-            secondCallToActionLink="https://github.com/henry-md/ChessHelper"
+            secondCallToActionLink="https://github.com/henry-md/chess-helper"
+          />
+        </FadeInSection>
+
+        {/* Intention Setter */}
+        <FadeInSection key={'1'}>
+          <FeaturedProject
+            src={IntentionSetterDemo}
+            poster={IntentionSetterPoster}
+            alt="Intention Setter project"
+            title="Intention Setter: Set Limtis On Chrome Websites"
+            description="I made a chrome extension to set limits on websites you visit (ex. 30 minute limit for all social media per day), and a public site users can optionally expose and send to friends that doxxes their own usage to create accountability."
+            callToAction="View My Usage"
+            callToActionLink="https://intention-setting-production.up.railway.app/henrymdeutsch"
+            secondCallToAction="View Github"
+            secondCallToActionLink="https://github.com/henry-md/intention-setting"
+          />
+        </FadeInSection>
+
+        {/* Vincent Dunn */}
+        <FadeInSection key={'2'}>
+          <FeaturedProject
+            src={VincentDemo}
+            poster={VincentPoster}
+            alt="Vincent Dunn website demo"
+            title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
+            description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace,” into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
+            callToAction="View Site"
+            callToActionLink="https://www.vincentdunn.com"
           />
         </FadeInSection>
         
-        <FadeInSection key={'4'}>
+        {/* Check It Out */}
+        <FadeInSection key={'3'}>
           <FeaturedProject
-            src={TypingHelperDemo}
-            poster={TypingHelperPoster}
-            alt="Typing helper project demo"
-            title="TypingHelper: Improve Special Character Typing Speed"
-            description="Generates typing test heavy in special characters to help with typing speed when coding. You can programatically control variables like the method used to generate the typing test, length of the test, and concentration of special characters."
-            callToAction="View Project"
-            callToActionLink="https://henry-md.github.io/Typing-Helper/"
-            secondCallToAction="View Github"
-            secondCallToActionLink="https://github.com/henry-md/Typing-Helper"
+            src={CheckItOutDemo}
+            poster={CheckItOutPoster}
+            alt="Check It Out project demo"
+            title="CheckItOut: Computer Vision Powered Solution to Checkout"
+            description="Made a physical checkout counter with an integrated scale, overhead camera, and processing unit performing automatic detection and classification of grocery items. Lightweight classifier and detector using MobileNetV2, with robust accuracy."
+            callToAction="View Devpost"
+            callToActionLink="https://devpost.com/software/check-it-out"
           />
         </FadeInSection>
 
