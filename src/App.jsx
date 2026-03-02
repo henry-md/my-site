@@ -8,14 +8,13 @@ import PropTypes from 'prop-types';
 import VincentDemo from './assets/vincent-dunn-demo.mov'
 import CheckItOutDemo from './assets/checkitout-demo.mov'
 import ChessHelperDemo from './assets/chess-helper-demo.mov'
-import TypingHelperDemo from './assets/typing-helper-demo.mov'
 import IntentionSetterDemo from './assets/intention-setter-demo.mov'
 
 import VincentPoster from './assets/vincent-dunn-poster.png'
 import CheckItOutPoster from './assets/checkitout-poster.png'
 import ChessHelperPoster from './assets/chess-helper-poster.png'
-import TypingHelperPoster from './assets/typing-helper-poster.png'
 import IntentionSetterPoster from './assets/intention-setter-poster.png'
+import RayTracerPoster from './assets/ray-tracer-poster.png'
 
 import Resume from './assets/HenryDeutschResume.pdf'
 import FancyHeadshot from './assets/headshot_fancy_small.png'
@@ -124,7 +123,7 @@ function App() {
             poster={ChessHelperPoster}
             alt="Chess Helper project demo"
             title="ChessHelper: An Interactive Way to Practice Chess Theory"
-            description="Understanding and memorizing chess theory is absolutely essential to becoming a better chess player. Create a PGN (Portable Game Notation) file with an app like Stockfish and practice that move-tree interactively with ChessHelper!"
+            description="Full stack web app for practicing chess opening theory. Users can sign in, save projects, and go through an interactive tutorial. Features move validation, progress tracking, and configurable practice settings like playing as either color. Built node/tree based PGN parsing logic."
             callToAction="View Project"
             callToActionLink="https://chess-helper-frontend-production.up.railway.app/"
             secondCallToAction="View Github"
@@ -139,11 +138,23 @@ function App() {
             poster={IntentionSetterPoster}
             alt="Intention Setter project"
             title="Intention Setter: Set Limtis On Chrome Websites"
-            description="I made a chrome extension to set limits on websites you visit (ex. 30 minute limit for all social media per day), and a public site users can optionally expose and send to friends that doxxes their own usage to create accountability."
+            description="Chrome extension to help set and track limits across websites to avoid doomscrolling. Manifest V3 architecture with a service worker tracking active timers, content scripts monitoring page visibility, and real-time Firebase sync to persist usage data and rules across devices. Users can view analytics on a Next.js dashboard to visualizes browsing patterns."
             callToAction="View My Usage"
             callToActionLink="https://intention-setting-production.up.railway.app/henrymdeutsch"
             secondCallToAction="View Github"
             secondCallToActionLink="https://github.com/henry-md/intention-setting"
+          />
+        </FadeInSection>
+
+        {/* Ray Tracer */}
+        <FadeInSection key={'4'}>
+          <FeaturedProject
+            poster={RayTracerPoster}
+            alt="Ray Tracer project picture"
+            title="Ray Tracer in C++"
+            description="Built ray tracing engine with C++, OpenGL, and multithreading — achieved 2.5x speedup over single-thread approach. Engineered 3D rendering pipeline with GLSL shaders and computational geometry intersection algorithms. Developed Phong illumination with quaternion camera controls, bilinear texture mapping, and ray shadow systems"
+            callToAction="View Github"
+            callToActionLink="https://github.com/henry-md/ray-tracer"
           />
         </FadeInSection>
 
@@ -153,8 +164,8 @@ function App() {
             src={VincentDemo}
             poster={VincentPoster}
             alt="Vincent Dunn website demo"
-            title="Vincent Dunn: Turned a Book Into Interactive Learning Site"
-            description="Worked for Vincent Dunn to turn his book, “A Firefighter's Battlespace,” into a website. Wrote JS to parse the pdf and create features dynamically. Created interactive UI for quizzing material. The site was up for ~12 months and got 2.7k pageviews per month."
+            title="Vincent Dunn's Website"
+            description="Improved SEO, increasing traffic from <100 to >3.6k visits per mo. and book royalties from 8K to ~24K YoY (2.99x). Used custom Java-based PDF parser to extract structured content from 200+ pages and generate HTML and CSS layouts."
             callToAction="View Site"
             callToActionLink="https://www.vincentdunn.com"
           />
