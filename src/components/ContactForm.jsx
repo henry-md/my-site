@@ -22,13 +22,14 @@ function ContactForm() {
   return (
     <form onSubmit={handleSubmitWithCallback}>
       <div className="form-container">
-        <h2>Get In Touch!</h2>
+        <h2>Let&apos;s Build Something Great</h2>
+        <p className="contact-intro">Share your idea, role, or project timeline and I&apos;ll respond promptly.</p>
         <div className='name-email'>
           <input
             id="email"
             type="email" 
             name="email"
-            placeholder="Email"
+            placeholder="Email address"
             required
           />
           <ValidationError 
@@ -39,9 +40,9 @@ function ContactForm() {
 
           <input
             id="name"
-            type="name" 
+            type="text" 
             name="name"
-            placeholder="Name"
+            placeholder="Full name"
             required
           />
           <ValidationError 
@@ -54,7 +55,7 @@ function ContactForm() {
         <textarea
           id="message"
           name="message"
-          placeholder="Message"
+          placeholder="Tell me what you&apos;re building"
           style={{ resize: "none" }}
           required
         />

@@ -9,6 +9,8 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 class TestimonialSwiper extends React.Component {
+  maxCollapsedHeight = 420;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -21,7 +23,7 @@ class TestimonialSwiper extends React.Component {
     if (container.classList.contains('expanded')) {
       container.classList.remove('expanded');
       button.textContent = 'See More';
-      content.style.maxHeight = '460px'; // [Ref 1] Should match what's in App.css
+      content.style.maxHeight = `${this.maxCollapsedHeight}px`; // Should match App.css
     } else {
       container.classList.add('expanded');
       button.textContent = 'See Less';
@@ -31,7 +33,6 @@ class TestimonialSwiper extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.updateSlidesPerView);
-    window.addEventListener('load', this.setupTestimonials);
 
     // deal with testimonials overflow
     this.setupTestimonials();
@@ -48,7 +49,7 @@ class TestimonialSwiper extends React.Component {
       button.removeEventListener('click', button.toggleTextHandler);
       
       // Check if content overflows
-      if (content.scrollHeight > 460) { // [Ref 1] - should match what's in App.css
+      if (content.scrollHeight > this.maxCollapsedHeight) {
         button.classList.add('visible');
         // Create a new handler and store it on the button element
         button.toggleTextHandler = () => this.toggleText(container, button, content);
@@ -91,10 +92,8 @@ class TestimonialSwiper extends React.Component {
   render() {
     return ( 
       <Swiper
-        spaceBetween={50}
+        spaceBetween={24}
         slidesPerView={this.state.slidesPerView}
-        onSlideChange={() => console.log('slide change')}
-        onSwiper={(swiper) => console.log(swiper)}
         loop={true}
         pagination={{ clickable: true }}
         modules={[Pagination]}
@@ -105,11 +104,13 @@ class TestimonialSwiper extends React.Component {
               className="open-quote"
               src={quote}
               alt="Open Quote"
+              draggable={false}
             />
             <img
               className="close-quote"
               src={quote}
               alt="Close Quote"
+              draggable={false}
             />
             <div className="expandable-container">
               <div className="expandable-content">
@@ -128,6 +129,7 @@ class TestimonialSwiper extends React.Component {
               src={james}
               alt="Avatar"
               className="avatar logan"
+              draggable={false}
             />
             <div className="name-title">
               <p>James Butler</p>
@@ -141,11 +143,13 @@ class TestimonialSwiper extends React.Component {
               className="open-quote"
               src={quote}
               alt="Open Quote"
+              draggable={false}
             />
             <img
               className="close-quote"
               src={quote}
               alt="Close Quote"
+              draggable={false}
             />
             <div className="expandable-container">
               <div className="expandable-content">
@@ -162,6 +166,7 @@ class TestimonialSwiper extends React.Component {
               src={logan}
               alt="Avatar"
               className="avatar logan"
+              draggable={false}
             />
             <div className="name-title">
               <p>Logan Ye</p>
@@ -175,11 +180,13 @@ class TestimonialSwiper extends React.Component {
               className="open-quote"
               src={quote}
               alt="Open Quote"
+              draggable={false}
             />
             <img
               className="close-quote"
               src={quote}
               alt="Close Quote"
+              draggable={false}
             />
             <div className="expandable-container">
               <div className="expandable-content">
@@ -194,6 +201,7 @@ class TestimonialSwiper extends React.Component {
               src={vincent}
               alt="Avatar"
               className="avatar vincent"
+              draggable={false}
             />
             <div className="name-title">
               <p>Vincent Dunn</p>
