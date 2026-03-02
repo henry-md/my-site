@@ -4,11 +4,16 @@ import { Pagination } from 'swiper/modules';
 import vincent from '../assets/vincent-dunn.jpeg';
 import logan from '../assets/logan-ye.png';
 import james from '../assets/james-butler.jpeg';
+import {
+  TESTIMONIAL_COLLAPSED_MAX_HEIGHT_PX,
+  TESTIMONIAL_DESKTOP_BREAKPOINT_PX,
+  TESTIMONIAL_SPACE_BETWEEN_PX,
+} from '../constants.ts';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
 class TestimonialSwiper extends React.Component {
-  maxCollapsedHeight = 420;
+  maxCollapsedHeight = TESTIMONIAL_COLLAPSED_MAX_HEIGHT_PX;
 
   constructor(props) {
     super(props);
@@ -80,7 +85,7 @@ class TestimonialSwiper extends React.Component {
   }
 
   getSlidesPerView() {
-    if (window.innerWidth > 800) return 2;
+    if (window.innerWidth > TESTIMONIAL_DESKTOP_BREAKPOINT_PX) return 2;
     return 1;
   }
 
@@ -91,7 +96,7 @@ class TestimonialSwiper extends React.Component {
   render() {
     return ( 
       <Swiper
-        spaceBetween={24}
+        spaceBetween={TESTIMONIAL_SPACE_BETWEEN_PX}
         slidesPerView={this.state.slidesPerView}
         loop={true}
         pagination={{ clickable: true }}

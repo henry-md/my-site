@@ -4,6 +4,7 @@ import TestimonialSwiper from './components/TestimonialSwiper.jsx';
 import FeaturedProject from './components/FeaturedProject.jsx';
 import ContactForm from './components/ContactForm.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
+import { ABOVE_FOLD_TEXT_SHIMMERS } from './constants.ts';
 
 import VincentDemo from './assets/vincent-dunn-demo.mov';
 import CheckItOutDemo from './assets/checkitout-demo.mov';
@@ -79,10 +80,10 @@ function App() {
             <div className="header-text fade-up">
               <p className="subhead-small">Full Stack Developer</p>
               <p className="subhead-rainbow">Hi, I&apos;m Henry</p>
-              <p className="subhead-big">
-                I build polished, high-performance software while studying at <span className="jhu-span">Johns Hopkins University.</span>
+              <p className={`subhead-big ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>
+                Software Engineer with experience shipping large-scale, revenue-driving systems.
               </p>
-              <p className="hero-meta">Open to impactful engineering internships and selective freelance engagements.</p>
+              <p className={`hero-meta ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>Open to full time software engineering roles.</p>
 
               <div className="resume-contact">
                 <a className="subhead-resume" href={Resume} target="_blank" rel="noreferrer">View Resume</a>

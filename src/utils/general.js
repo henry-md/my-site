@@ -1,3 +1,5 @@
+import { MOBILE_NAV_BREAKPOINT_PX } from '../constants.ts';
+
 function toggle() {
   const nav = document.getElementById('myTopnav');
   nav.classList.toggle('responsive');
@@ -15,7 +17,7 @@ function smoothScroll(event) {
   }
 
   const nav = document.getElementById('myTopnav');
-  if (window.innerWidth <= 900 && nav.classList.contains('responsive')) {
+  if (window.innerWidth <= MOBILE_NAV_BREAKPOINT_PX && nav.classList.contains('responsive')) {
     nav.classList.remove('responsive');
   }
 }

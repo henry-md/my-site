@@ -293,6 +293,22 @@ body,
   letter-spacing: -0.015em;
 }
 
+.above-fold-text-shimmer {
+  background-image: var(--hero-shimmer-gradient);
+  background-size: var(--hero-shimmer-stripe) 100%;
+  background-repeat: repeat-x;
+  background-position: 0 50%;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shimmer-text 6.2s linear infinite;
+}
+
+.subhead-big.above-fold-text-shimmer .jhu-span {
+  color: inherit;
+}
+
 .jhu-span {
   color: var(--brand-strong);
   font-weight: 700;
@@ -839,7 +855,8 @@ button.toggle-see-more-btn:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .subhead-rainbow {
+  .subhead-rainbow,
+  .above-fold-text-shimmer {
     animation: none;
   }
 }
