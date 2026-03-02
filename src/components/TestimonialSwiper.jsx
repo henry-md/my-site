@@ -4,7 +4,6 @@ import { Pagination } from 'swiper/modules';
 import vincent from '../assets/vincent-dunn.jpeg';
 import logan from '../assets/logan-ye.png';
 import james from '../assets/james-butler.jpeg';
-import quote from '../assets/quote.jpeg';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -100,18 +99,8 @@ class TestimonialSwiper extends React.Component {
       >
         <SwiperSlide>
           <div className="quote-content">
-            <img
-              className="open-quote"
-              src={quote}
-              alt="Open Quote"
-              draggable={false}
-            />
-            <img
-              className="close-quote"
-              src={quote}
-              alt="Close Quote"
-              draggable={false}
-            />
+            <span className="open-quote" aria-hidden="true">&ldquo;</span>
+            <span className="close-quote" aria-hidden="true">&rdquo;</span>
             <div className="expandable-container">
               <div className="expandable-content">
                 <p>&quot;A Force Multiplier&quot; perfectly captures Henry Deutsch&apos;s contributions during his time at Helpful Engineering.</p>
@@ -139,18 +128,8 @@ class TestimonialSwiper extends React.Component {
         </SwiperSlide>
         <SwiperSlide>
           <div className="quote-content">
-            <img
-              className="open-quote"
-              src={quote}
-              alt="Open Quote"
-              draggable={false}
-            />
-            <img
-              className="close-quote"
-              src={quote}
-              alt="Close Quote"
-              draggable={false}
-            />
+            <span className="open-quote" aria-hidden="true">&ldquo;</span>
+            <span className="close-quote" aria-hidden="true">&rdquo;</span>
             <div className="expandable-container">
               <div className="expandable-content">
                 <p>Henry was a standout member of our team this summer where he worked on the development of KnoWhiz, an application that had both front and backend challenges.</p>
@@ -176,18 +155,8 @@ class TestimonialSwiper extends React.Component {
         </SwiperSlide>
         <SwiperSlide>
           <div className="quote-content">
-            <img
-              className="open-quote"
-              src={quote}
-              alt="Open Quote"
-              draggable={false}
-            />
-            <img
-              className="close-quote"
-              src={quote}
-              alt="Close Quote"
-              draggable={false}
-            />
+            <span className="open-quote" aria-hidden="true">&ldquo;</span>
+            <span className="close-quote" aria-hidden="true">&rdquo;</span>
             <div className="expandable-container">
               <div className="expandable-content">
                 <p>I&apos;ve had the pleasure of working with Henry to develop my website, and have been consistently impressed by his ability to ask the right questions, and deliver on software that fits the particular needs of the situation. In all of the projects we&apos;ve worked on together he&apos;s kept great communication, and made my role stress-free. After completely re-doing my site and enhancing SEO my online book sales increased by 50%.</p>

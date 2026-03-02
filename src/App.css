@@ -32,6 +32,7 @@
     var(--hero-shimmer-purple) 610px,
     var(--hero-shimmer-red-deep) 720px
   );
+  --quote-mark-color: rgba(90, 104, 132, 0.28);
 }
 
 body,
@@ -452,25 +453,42 @@ body,
 .quote-content {
   position: relative;
   margin: 0;
+  padding-top: 0.72rem;
+  padding-bottom: 1.55rem;
 }
 
-[class$='quote'] {
-  width: 24px;
+.quote-content > *:not(.open-quote):not(.close-quote) {
+  position: relative;
+  z-index: 1;
+}
+
+.open-quote,
+.close-quote {
+  display: inline-block;
   position: absolute;
   z-index: 0;
-  opacity: 0.22;
+  color: var(--quote-mark-color);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  user-select: none;
 }
 
 .open-quote {
-  transform: rotateX(180deg);
-  top: -14px;
-  left: -2px;
+  top: -0.22rem;
+  left: 0.35rem;
 }
 
 .close-quote {
-  transform: rotateY(180deg);
-  bottom: -14px;
-  right: -2px;
+  bottom: 0.05rem;
+  right: 0.35rem;
+}
+
+.quote-content .expandable-content p:first-child {
+  margin-top: 0.85rem;
 }
 
 .expandable-container {
