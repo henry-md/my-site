@@ -81,7 +81,7 @@ function App() {
               <p className="subhead-small">Full Stack Developer</p>
               <p className="subhead-rainbow">Hi, I&apos;m Henry</p>
               <p className={`subhead-big ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>
-                Software Engineer with experience shipping large-scale, revenue-driving systems.
+                Software Engineer with experience shipping large-scale, revenue-driving systems. {/* jhu-span */}
               </p>
               <p className={`hero-meta ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>Open to full time software engineering roles.</p>
 

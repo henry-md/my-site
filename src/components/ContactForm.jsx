@@ -22,8 +22,8 @@ function ContactForm() {
   return (
     <form onSubmit={handleSubmitWithCallback}>
       <div className="form-container">
-        <h2>Let&apos;s Build Something Great</h2>
-        <p className="contact-intro">Share your idea, role, or project timeline and I&apos;ll respond promptly.</p>
+        <h2>Let&apos;s Get In Touch!</h2>
+        <p className="contact-intro">Messages will go right to my personal inbox.</p>
         <div className='name-email'>
           <input
             id="email"
