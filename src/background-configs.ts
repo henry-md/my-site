@@ -4,7 +4,7 @@ export type BackgroundConfig = {
   id: string;
   label: string;
   uiMode: UiMode;
-  canvasType: 'none' | 'creepy-eye';
+  canvasType: 'none' | 'hexagon-3d';
   canvasOpacity: number;
 };
 
@@ -17,13 +17,12 @@ export const BACKGROUND_CONFIGS: BackgroundConfig[] = [
     canvasOpacity: 0,
   },
   {
-    id: 'creepy-eye',
-    label: 'Creepy Eye',
-    uiMode: 'dark',
-    canvasType: 'creepy-eye',
-    canvasOpacity: 0.2,
+    id: 'hexagon-3d',
+    label: 'hexagon-3d',
+    uiMode: 'light',
+    canvasType: 'hexagon-3d',
+    canvasOpacity: 1,
   },
 ];
 
-export const DEFAULT_BACKGROUND_ID = 'classic';
-
+export const DEFAULT_BACKGROUND_ID = 'hexagon-3d';

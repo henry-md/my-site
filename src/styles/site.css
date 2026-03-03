@@ -197,7 +197,7 @@ body,
   z-index: 2;
 }
 
-.creepy-eye-canvas {
+.background-canvas {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -373,6 +373,70 @@ body,
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+}
+
+.theme-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(2, 6, 16, 0.38);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 82px clamp(14px, 2.2vw, 26px) 16px;
+}
+
+.theme-modal {
+  width: min(300px, calc(100vw - 32px));
+  border-radius: 16px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  box-shadow: 0 18px 44px rgba(3, 9, 21, 0.28);
+  padding: 0.7rem;
+}
+
+.theme-modal-title {
+  color: var(--text-strong);
+  font-weight: 700;
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.34rem 0.58rem;
+}
+
+.theme-modal-list {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.theme-option {
+  width: 100%;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--surface-soft);
+  color: var(--text-strong);
+  padding: 0.6rem 0.68rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  cursor: pointer;
+}
+
+.theme-option:hover {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.theme-option.active {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+
+.theme-option-mode {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .topnav .icon {

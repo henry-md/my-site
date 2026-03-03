@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import TestimonialSwiper from './components/TestimonialSwiper.jsx';
 import FeaturedProject from './components/FeaturedProject.jsx';
 import ContactForm from './components/ContactForm.jsx';
-import CreepyEyeBackground from './components/CreepyEyeBackground.jsx';
+import Hexagon3dBackground from './components/Hexagon3dBackground.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
 import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
@@ -88,14 +88,13 @@ function App() {
     }
     return normalizeUiMode(window.localStorage.getItem(UI_MODE_STORAGE_KEY));
   });
+  const [isThemeModalOpen, setIsThemeModalOpen] = React.useState(false);
 
   const selectedTheme = DEBUG_UI
     ? getBackgroundById(themeId)
     : getBackgroundById(DEFAULT_BACKGROUND_ID);
   const activeUiMode = DEBUG_UI ? (uiModePreference || selectedTheme.uiMode) : UI_LIGHT;
-  const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
-  const selectedThemeIndex = BACKGROUND_CONFIGS.findIndex((theme) => theme.id === selectedTheme.id);
-  const nextTheme = BACKGROUND_CONFIGS[(selectedThemeIndex + 1) % BACKGROUND_CONFIGS.length];
+  const hexagon3dBackgroundEnabled = selectedTheme.canvasType === 'hexagon-3d';
 
   React.useEffect(() => {
     const themeClassNames = BACKGROUND_CONFIGS.map((theme) => `theme-${theme.id}`);
@@ -121,9 +120,26 @@ function App() {
     };
   }, [activeUiMode, selectedTheme.id, uiModePreference]);
 
+  React.useEffect(() => {
+    if (!isThemeModalOpen) {
+      return undefined;
+    }
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsThemeModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isThemeModalOpen]);
+
   return (
     <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode}`}>
-      {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
+      {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} /> : null}
 
       <div className="topnav" id="myTopnav">
         <a href="#home" className="name" onClick={smoothScroll}>Henry Magnus Deutsch</a>
@@ -139,12 +155,8 @@ function App() {
             <button
               type="button"
               className="theme-toggle"
-              onClick={() => {
-                setThemeId(nextTheme.id);
-                // Theme selection should default to that theme's configured UI mode.
-                setUiModePreference(null);
-              }}
-              aria-label={`Switch theme. Next theme: ${nextTheme.label}`}
+              onClick={() => setIsThemeModalOpen(true)}
+              aria-label="Open theme selector"
               title={`Theme: ${selectedTheme.label}`}
             >
               <svg
@@ -157,17 +169,8 @@ function App() {
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                {nextTheme.id === 'creepy-eye' ? (
-                  <>
-                    <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z" />
-                    <circle cx="12" cy="12" r="2.8" />
-                  </>
-                ) : (
-                  <>
-                    <circle cx="12" cy="12" r="3.9" />
-                    <path d="M12 2.6v2.2M12 19.2v2.2M4.8 4.8l1.6 1.6M17.6 17.6l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.8 19.2l1.6-1.6M17.6 6.4l1.6-1.6" />
-                  </>
-                )}
+                <circle cx="12" cy="12" r="3.9" />
+                <path d="M12 2.6v2.2M12 19.2v2.2M4.8 4.8l1.6 1.6M17.6 17.6l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.8 19.2l1.6-1.6M17.6 6.4l1.6-1.6" />
               </svg>
               <span className="toggle-label">Theme: {selectedTheme.label}</span>
             </button>
@@ -318,6 +321,39 @@ function App() {
           © {new Date().getFullYear()} Henry Magnus Deutsch
         </div>
       </div>
+
+      {DEBUG_UI && isThemeModalOpen ? (
+        <div
+          className="theme-modal-overlay"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsThemeModalOpen(false);
+            }
+          }}
+        >
+          <div className="theme-modal" role="dialog" aria-modal="true" aria-label="Theme selector">
+            <div className="theme-modal-title">Select Theme</div>
+            <div className="theme-modal-list">
+              {BACKGROUND_CONFIGS.map((background) => (
+                <button
+                  type="button"
+                  key={background.id}
+                  className={`theme-option ${background.id === selectedTheme.id ? 'active' : ''}`}
+                  onClick={() => {
+                    setThemeId(background.id);
+                    setUiModePreference(null);
+                    setIsThemeModalOpen(false);
+                  }}
+                >
+                  <span>{background.label}</span>
+                  <span className="theme-option-mode">{background.uiMode}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
