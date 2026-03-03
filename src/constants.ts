@@ -1,4 +1,5 @@
 export const ABOVE_FOLD_TEXT_SHIMMERS = false;
+export const DEBUG_UI = false;
 
 export const TESTIMONIAL_COLLAPSED_MAX_HEIGHT_PX = 420;
 export const TESTIMONIAL_DESKTOP_BREAKPOINT_PX = 800;

@@ -1,0 +1,16 @@
+html, head, body, canvas {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  line-height: 0;
+  position: fixed;
+}
+
+canvas {
+  cursor: pointer;
+}
+
+body {
+  background-color: black;
+  /* background: url('../img/cloudsco.png'); */
+}

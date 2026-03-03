@@ -28,6 +28,10 @@ body {
     #f3f6fb;
 }
 
+body.background-style-creepy-eye {
+  background: #04080e;
+}
+
 img,
 video {
   max-width: 100%;

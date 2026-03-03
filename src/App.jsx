@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import TestimonialSwiper from './components/TestimonialSwiper.jsx';
 import FeaturedProject from './components/FeaturedProject.jsx';
 import ContactForm from './components/ContactForm.jsx';
+import CreepyEyeBackground from './components/CreepyEyeBackground.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
-import { ABOVE_FOLD_TEXT_SHIMMERS } from './constants.ts';
+import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI } from './constants.ts';
+import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
 
 import VincentDemo from './assets/vincent-dunn-demo.mov';
 import CheckItOutDemo from './assets/checkitout-demo.mov';
@@ -21,7 +23,23 @@ import Resume from './assets/HenryDeutschResume.pdf';
 import FancyHeadshot from './assets/headshot_fancy_small.png';
 
 import 'swiper/css';
-import './App.css';
+
+const THEME_STORAGE_KEY = 'site-theme-id';
+const UI_MODE_STORAGE_KEY = 'ui-mode-pref-v2';
+const UI_LIGHT = 'light';
+const UI_DARK = 'dark';
+
+function normalizeUiMode(value) {
+  if (value === UI_LIGHT || value === UI_DARK) {
+    return value;
+  }
+  return null;
+}
+
+function getBackgroundById(id) {
+  const match = BACKGROUND_CONFIGS.find((background) => background.id === id);
+  return match || BACKGROUND_CONFIGS[0];
+}
 
 function FadeInSection(props) {
   const [isVisible, setVisible] = React.useState(false);
@@ -56,8 +74,57 @@ FadeInSection.propTypes = {
 };
 
 function App() {
+  const [themeId, setThemeId] = React.useState(() => {
+    if (typeof window === 'undefined') {
+      return DEFAULT_BACKGROUND_ID;
+    }
+
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return getBackgroundById(storedTheme || DEFAULT_BACKGROUND_ID).id;
+  });
+  const [uiModePreference, setUiModePreference] = React.useState(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    return normalizeUiMode(window.localStorage.getItem(UI_MODE_STORAGE_KEY));
+  });
+
+  const selectedTheme = DEBUG_UI
+    ? getBackgroundById(themeId)
+    : getBackgroundById(DEFAULT_BACKGROUND_ID);
+  const activeUiMode = DEBUG_UI ? (uiModePreference || selectedTheme.uiMode) : UI_LIGHT;
+  const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
+  const selectedThemeIndex = BACKGROUND_CONFIGS.findIndex((theme) => theme.id === selectedTheme.id);
+  const nextTheme = BACKGROUND_CONFIGS[(selectedThemeIndex + 1) % BACKGROUND_CONFIGS.length];
+
+  React.useEffect(() => {
+    const themeClassNames = BACKGROUND_CONFIGS.map((theme) => `theme-${theme.id}`);
+    const bodyThemeClass = `theme-${selectedTheme.id}`;
+    const bodyUiClass = `ui-${activeUiMode}`;
+
+    document.body.classList.remove(...themeClassNames, 'ui-light', 'ui-dark');
+    document.body.classList.add(bodyThemeClass, bodyUiClass);
+    if (DEBUG_UI) {
+      window.localStorage.setItem(THEME_STORAGE_KEY, selectedTheme.id);
+      if (uiModePreference) {
+        window.localStorage.setItem(UI_MODE_STORAGE_KEY, uiModePreference);
+      } else {
+        window.localStorage.removeItem(UI_MODE_STORAGE_KEY);
+      }
+    } else {
+      window.localStorage.removeItem(THEME_STORAGE_KEY);
+      window.localStorage.removeItem(UI_MODE_STORAGE_KEY);
+    }
+
+    return () => {
+      document.body.classList.remove(bodyThemeClass, bodyUiClass);
+    };
+  }, [activeUiMode, selectedTheme.id, uiModePreference]);
+
   return (
-    <>
+    <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode}`}>
+      {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
+
       <div className="topnav" id="myTopnav">
         <a href="#home" className="name" onClick={smoothScroll}>Henry Magnus Deutsch</a>
 
@@ -66,6 +133,68 @@ function App() {
           <a href="#featured" onClick={smoothScroll}>Featured Projects</a>
           <a href="#contact" onClick={smoothScroll}>Contact</a>
         </div>
+
+        {DEBUG_UI ? (
+          <>
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => {
+                setThemeId(nextTheme.id);
+                // Theme selection should default to that theme's configured UI mode.
+                setUiModePreference(null);
+              }}
+              aria-label={`Switch theme. Next theme: ${nextTheme.label}`}
+              title={`Theme: ${selectedTheme.label}`}
+            >
+              <svg
+                className="theme-toggle-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {nextTheme.id === 'creepy-eye' ? (
+                  <>
+                    <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z" />
+                    <circle cx="12" cy="12" r="2.8" />
+                  </>
+                ) : (
+                  <>
+                    <circle cx="12" cy="12" r="3.9" />
+                    <path d="M12 2.6v2.2M12 19.2v2.2M4.8 4.8l1.6 1.6M17.6 17.6l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.8 19.2l1.6-1.6M17.6 6.4l1.6-1.6" />
+                  </>
+                )}
+              </svg>
+              <span className="toggle-label">Theme: {selectedTheme.label}</span>
+            </button>
+
+            <button
+              type="button"
+              className="theme-toggle ui-mode-toggle"
+              onClick={() => setUiModePreference(activeUiMode === UI_DARK ? UI_LIGHT : UI_DARK)}
+              aria-label="Toggle UI mode between light and dark"
+              title="Toggle light or dark UI mode"
+            >
+              <svg
+                className="theme-toggle-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M21 12.4A8.4 8.4 0 1111.6 3a6.7 6.7 0 009.4 9.4z" />
+              </svg>
+              <span className="toggle-label">UI: {activeUiMode}</span>
+            </button>
+          </>
+        ) : null}
 
         <button type="button" className="icon" onClick={toggle} aria-label="Toggle menu">
           <span></span>
@@ -189,7 +318,7 @@ function App() {
           © {new Date().getFullYear()} Henry Magnus Deutsch
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

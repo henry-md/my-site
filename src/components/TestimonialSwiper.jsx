@@ -27,7 +27,7 @@ class TestimonialSwiper extends React.Component {
     if (container.classList.contains('expanded')) {
       container.classList.remove('expanded');
       button.textContent = 'See More';
-      content.style.maxHeight = `${this.maxCollapsedHeight}px`; // Should match App.css
+      content.style.maxHeight = `${this.maxCollapsedHeight}px`; // Should match src/styles/site.css
     } else {
       container.classList.add('expanded');
       button.textContent = 'See Less';
