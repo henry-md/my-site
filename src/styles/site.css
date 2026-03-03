@@ -110,7 +110,11 @@ textarea {
   --surface-hero: linear-gradient(155deg, #ffffff 5%, #dbe8fb 110%);
   --surface-card: linear-gradient(150deg, #ffffff 15%, #f4f8ff 100%);
   --surface-card-alt: linear-gradient(150deg, #ffffff 10%, #f4f8ff 95%);
-  --surface-contact: linear-gradient(180deg, rgba(225, 234, 249, 0.6), rgba(243, 246, 251, 0.95));
+  --surface-contact:
+    radial-gradient(circle at -10% -18%, rgba(11, 96, 194, 0.2), transparent 70%),
+    radial-gradient(circle at 8% 4%, rgba(11, 96, 194, 0.14), transparent 58%),
+    radial-gradient(circle at 90% 10%, rgba(10, 163, 143, 0.11), transparent 52%),
+    #f3f6fb;
   --surface-contact-border: var(--line-soft);
   --surface-field: rgba(255, 255, 255, 0.9);
   --surface-field-focus: #ffffff;
@@ -194,7 +198,7 @@ body,
 
 .content {
   position: relative;
-  z-index: 2;
+  z-index: auto;
 }
 
 .background-canvas {
@@ -202,7 +206,7 @@ body,
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 0;
+  z-index: 2;
   pointer-events: none;
   opacity: 1;
 }
@@ -463,12 +467,14 @@ body,
 }
 
 .content {
+  position: relative;
   padding: 0 0 24px;
   overflow: visible;
 }
 
 .header-container {
   position: relative;
+  z-index: 3;
   padding-top: clamp(1rem, 2.2vw, 2rem);
   min-height: clamp(620px, calc(100vh - 96px), 860px);
   display: flex;
@@ -661,6 +667,8 @@ body,
 }
 
 .section {
+  position: relative;
+  z-index: 3;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: clamp(3.2rem, 7vw, 4.8rem) clamp(1rem, 4vw, 2.25rem) 0;
@@ -905,11 +913,23 @@ button.toggle-see-more-btn:hover {
 }
 
 .contact.section {
+  position: relative;
   max-width: none;
+  z-index: auto;
   margin-top: clamp(3rem, 6vw, 4.6rem);
   padding: clamp(3.2rem, 8vw, 5.4rem) 0 0;
-  background: var(--surface-contact);
+  background: transparent;
   border-top: 1px solid var(--surface-contact-border);
+}
+
+.contact.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--surface-contact);
+  background-attachment: fixed;
+  pointer-events: none;
 }
 
 .form-container {
@@ -920,6 +940,8 @@ button.toggle-see-more-btn:hover {
   display: flex;
   flex-direction: column;
   gap: 0.95rem;
+  position: relative;
+  z-index: 3;
 }
 
 .form-container h2 {
@@ -972,6 +994,8 @@ button.toggle-see-more-btn:hover {
 }
 
 .copyright {
+  position: relative;
+  z-index: 3;
   padding: 1.2rem 0 0.45rem;
   display: flex;
   justify-content: center;

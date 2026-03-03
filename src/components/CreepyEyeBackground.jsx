@@ -388,7 +388,7 @@ function CreepyEyeBackground({ opacity = 1 }) {
 
   return (
     <canvas
-      className="creepy-eye-canvas"
+      className="background-canvas"
       id="canvas"
       ref={canvasRef}
       style={{ opacity }}
