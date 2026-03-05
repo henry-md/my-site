@@ -1,5 +1,8 @@
 export const ABOVE_FOLD_TEXT_SHIMMERS = false;
-export const DEBUG_UI = true;
+export const DEBUG_UI =
+  String(
+    (import.meta as ImportMeta & { env: { VITE_DEBUG_UI?: string } }).env.VITE_DEBUG_UI
+  ).toLowerCase() === 'true';
 
 export const TESTIMONIAL_COLLAPSED_MAX_HEIGHT_PX = 420;
 export const TESTIMONIAL_DESKTOP_BREAKPOINT_PX = 800;
