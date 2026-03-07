@@ -7,7 +7,7 @@ import CreepyEyeBackground from './components/CreepyEyeBackground.jsx';
 import Hexagon3dBackground from './components/Hexagon3dBackground.jsx';
 import BirdsBackground from './components/BirdsBackground.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
-import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI } from './constants.ts';
+import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI, MENU_BAR_STAYS_AT_TOP } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
 
 import VincentDemo from './assets/vincent-dunn-demo.mov';
@@ -49,11 +49,17 @@ function FadeInSection(props) {
 
   React.useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => setVisible(entry.isIntersecting));
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(entry.target);
+        }
+      });
     });
 
-    if (domRef.current) {
-      observer.observe(domRef.current);
+    const node = domRef.current;
+    if (node) {
+      observer.observe(node);
     }
 
     return () => {
@@ -142,7 +148,7 @@ function App() {
   }, [isThemeModalOpen]);
 
   return (
-    <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode}`}>
+    <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode} ${MENU_BAR_STAYS_AT_TOP ? 'menu-bar-fixed' : ''}`}>
       {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
       {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} uiMode={activeUiMode} /> : null}
       {birdsBackgroundEnabled ? <BirdsBackground opacity={selectedTheme.canvasOpacity} /> : null}
