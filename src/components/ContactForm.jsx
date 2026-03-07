@@ -20,56 +20,63 @@ function ContactForm() {
     }
   };
   return (
-    <form onSubmit={handleSubmitWithCallback}>
-      <div className="form-container">
-        <h2>Get In Touch!</h2>
-        <p className="contact-intro">Messages go right to my inbox</p>
-        <div className='name-email'>
+    <form className="contact-form" onSubmit={handleSubmitWithCallback}>
+      <h2>Get In Touch!</h2>
+      <p className="contact-intro">Let me know what you&apos;re building. Messages go right to my inbox.</p>
+
+      <div className="name-email">
+        <div className="field-wrap">
           <input
             id="email"
-            type="email" 
+            type="email"
             name="email"
             placeholder="Email address"
             required
           />
-          <ValidationError 
-            prefix="Email" 
+          <ValidationError
+            prefix="Email"
             field="email"
-            errors={state.errors}
-          />
-
-          <input
-            id="name"
-            type="text" 
-            name="name"
-            placeholder="Full name"
-            required
-          />
-          <ValidationError 
-            prefix="Name" 
-            field="name"
             errors={state.errors}
           />
         </div>
 
+        <div className="field-wrap">
+          <input
+            id="name"
+            type="text"
+            name="name"
+            placeholder="Full name"
+            required
+          />
+          <ValidationError
+            prefix="Name"
+            field="name"
+            errors={state.errors}
+          />
+        </div>
+      </div>
+
+      <div className="field-wrap">
         <textarea
           id="message"
           name="message"
-          placeholder="Tell me what you&apos;re building"
+          placeholder="What&apos;s up?"
           style={{ resize: "none" }}
           required
         />
-        <ValidationError 
-          prefix="Message" 
+        <ValidationError
+          prefix="Message"
           field="message"
           errors={state.errors}
         />
+      </div>
 
+      <div className="contact-footer">
+        <p className="contact-note">Typical response within 24 hours.</p>
         <button type="submit" className="dark-button submit" disabled={state.submitting}>
-          Send
+          {state.submitting ? 'Sending...' : 'Send Message'}
         </button>
       </div>
-      
     </form>
   );
 }
