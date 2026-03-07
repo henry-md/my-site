@@ -1,10 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { BIRD_THEME_COLOR_GRADIENT, BIRD_THEME_COLOR_MODE } from '../constants.ts';
 
 const THREE_SCRIPT_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
 const VANTA_BIRDS_SCRIPT_SRC = 'https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.birds.min.js';
 
 const scriptPromises = new Map();
+
+function hexToVantaColor(hex) {
+  const raw = String(hex).trim().replace(/^#/, '');
+  const normalized = raw.length === 3
+    ? raw.split('').map((ch) => ch + ch).join('')
+    : raw;
+
+  if (!/^[\da-fA-F]{6}$/.test(normalized)) {
+    return 0x5478bb;
+  }
+
+  return Number.parseInt(normalized, 16);
+}
 
 function loadScript(src, isReady) {
   if (typeof window === 'undefined') {
@@ -41,6 +55,9 @@ function loadScript(src, isReady) {
 
 function BirdsBackground({ opacity = 1 }) {
   const rootRef = React.useRef(null);
+  const startColor = BIRD_THEME_COLOR_GRADIENT.start;
+  const endColor = BIRD_THEME_COLOR_GRADIENT.end;
+  const colorMode = BIRD_THEME_COLOR_MODE;
 
   React.useEffect(() => {
     let cancelled = false;
@@ -69,8 +86,9 @@ function BirdsBackground({ opacity = 1 }) {
           scaleMobile: 1,
           backgroundAlpha: 0,
           backgroundColor: 0xf8fbff,
-          color1: 0x5478bb,
-          color2: 0x8eb4e6,
+          colorMode,
+          color1: hexToVantaColor(startColor),
+          color2: hexToVantaColor(endColor),
           quantity: 3,
           birdSize: 1.05,
           wingSpan: 21,
@@ -92,7 +110,7 @@ function BirdsBackground({ opacity = 1 }) {
         vantaEffect.destroy();
       }
     };
-  }, []);
+  }, [startColor, endColor, colorMode]);
 
   return (
     <div

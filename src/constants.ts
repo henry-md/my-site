@@ -9,6 +9,13 @@ export const LIGHT_THEME_COLOR_GRADIENT = {
   end: '#fff',
 };
 
+export const BIRD_THEME_COLOR_GRADIENT = {
+  start: '#5478bb',
+  end: '#5478bb',
+};
+
+export const BIRD_THEME_COLOR_MODE = 'lerp';
+
 export const TESTIMONIAL_COLLAPSED_MAX_HEIGHT_PX = 420;
 export const TESTIMONIAL_DESKTOP_BREAKPOINT_PX = 800;
 export const TESTIMONIAL_SPACE_BETWEEN_PX = 24;

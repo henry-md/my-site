@@ -209,6 +209,23 @@ textarea {
   --thread-stroke: hsla(0, 0%, 100%, 0.2);
   --thread-fill: hsla(0, 0%, 100%, 0.2);
   --button-elevated-shadow: 0 10px 24px rgba(7, 70, 149, 0.3);
+  --button-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.34), inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  --button-glass-shadow: 0 9px 20px rgba(17, 35, 64, 0.25);
+  --button-glass-shadow-hover: 0 14px 28px rgba(12, 28, 54, 0.33);
+  --button-primary-surface: linear-gradient(125deg, rgb(12, 93, 194), rgb(6, 66, 144));
+  --button-primary-surface-hover: linear-gradient(125deg, rgb(16, 103, 208), rgb(8, 74, 158));
+  --button-primary-border: transparent;
+  --button-primary-text: #f5f9ff;
+  --button-secondary-surface: #f2f4f7;
+  --button-secondary-surface-hover: #f7f9fc;
+  --button-secondary-border: rgba(194, 202, 216, 0.9);
+  --button-secondary-text: #1a2438;
+  --button-liquid-reflection:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.03) 24%, rgba(255, 255, 255, 0) 48%),
+    linear-gradient(116deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 28%, rgba(255, 255, 255, 0) 52%, rgba(163, 198, 245, 0.06) 80%, rgba(255, 255, 255, 0.03) 100%);
+  --button-liquid-reflection-light:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.08) 26%, rgba(255, 255, 255, 0) 54%),
+    linear-gradient(116deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 28%, rgba(255, 255, 255, 0) 52%, rgba(163, 198, 245, 0.08) 80%, rgba(255, 255, 255, 0.05) 100%);
   --light-glass-surface:
     linear-gradient(145deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.68) 42%, rgba(236, 244, 255, 0.58) 100%);
   --light-glass-surface-soft:
@@ -270,6 +287,20 @@ body.ui-dark {
   --thread-stroke: hsla(0, 0%, 100%, 0.36);
   --thread-fill: hsla(0, 0%, 100%, 0.16);
   --button-elevated-shadow: 0 10px 24px rgba(4, 7, 12, 0.52);
+  --button-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+  --button-glass-shadow: 0 10px 22px rgba(0, 0, 0, 0.34);
+  --button-glass-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.44);
+  --button-primary-surface: linear-gradient(140deg, rgba(112, 157, 225, 0.62) 0%, rgba(78, 124, 193, 0.78) 52%, rgba(50, 93, 160, 0.86) 100%);
+  --button-primary-surface-hover: linear-gradient(140deg, rgba(126, 170, 236, 0.68) 0%, rgba(88, 135, 206, 0.84) 52%, rgba(58, 102, 171, 0.9) 100%);
+  --button-primary-border: rgba(212, 230, 255, 0.45);
+  --button-primary-text: #f4f8ff;
+  --button-secondary-surface: linear-gradient(140deg, rgba(168, 201, 246, 0.28) 0%, rgba(130, 173, 232, 0.36) 52%, rgba(98, 144, 209, 0.42) 100%);
+  --button-secondary-surface-hover: linear-gradient(140deg, rgba(178, 209, 251, 0.34) 0%, rgba(139, 181, 238, 0.42) 52%, rgba(106, 152, 216, 0.48) 100%);
+  --button-secondary-border: rgba(201, 223, 255, 0.34);
+  --button-secondary-text: #edf4ff;
+  --button-liquid-reflection:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.08) 24%, rgba(255, 255, 255, 0) 52%),
+    linear-gradient(118deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.05) 26%, rgba(255, 255, 255, 0) 48%, rgba(172, 197, 232, 0.1) 78%, rgba(255, 255, 255, 0.06) 100%);
   --glass-surface:
     linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.07) 34%, rgba(9, 12, 19, 0.48) 100%);
   --glass-surface-soft:
@@ -352,7 +383,10 @@ body,
 }
 
 .dark-button,
-.light-button {
+.light-button,
+.subhead-resume,
+.subhead-contact,
+button.toggle-see-more-btn {
   border: 1px solid transparent;
   border-radius: 12px;
   text-decoration: none;
@@ -365,6 +399,14 @@ body,
   justify-content: center;
   transition: all 220ms ease;
   white-space: nowrap;
+}
+
+.dark-button::before,
+.light-button::before,
+.subhead-resume::before,
+.subhead-contact::before,
+button.toggle-see-more-btn::before {
+  display: none;
 }
 
 .dark-button {
@@ -391,7 +433,7 @@ body,
 
 .topnav {
   position: sticky;
-  top: 12px;
+  top: 18px;
   z-index: 50;
   max-width: var(--max-width);
   margin: 16px auto 0;
@@ -408,7 +450,7 @@ body,
 
 .app-shell.menu-bar-fixed .topnav {
   position: fixed;
-  top: 12px;
+  top: 18px;
   left: 50%;
   transform: translateX(-50%);
   width: min(var(--max-width), calc(100% - 20px));
@@ -417,7 +459,7 @@ body,
 }
 
 .app-shell.menu-bar-fixed .content {
-  padding-top: 84px;
+  padding-top: 78px;
 }
 
 .topnav a {
@@ -589,7 +631,7 @@ body,
 .header-container {
   position: relative;
   z-index: 3;
-  padding-top: clamp(1rem, 2.2vw, 2rem);
+  padding-top: clamp(0.5rem, 1.6vw, 1.4rem);
   min-height: clamp(620px, calc(100vh - 96px), 860px);
   display: flex;
   align-items: center;
@@ -960,7 +1002,6 @@ button.toggle-see-more-btn {
   border-radius: var(--radius-pill);
   cursor: pointer;
   box-sizing: border-box;
-  transition: all 180ms ease;
   align-items: center;
   justify-content: center;
 }
@@ -1212,10 +1253,7 @@ body.ui-light .horizontal-tabs a:hover {
 
 body.ui-light .theme-toggle,
 body.ui-light .theme-option,
-body.ui-light .topnav .icon,
-body.ui-light .light-button,
-body.ui-light .subhead-contact,
-body.ui-light button.toggle-see-more-btn {
+body.ui-light .topnav .icon {
   background: var(--light-glass-surface-subtle);
   border-color: var(--light-glass-border-soft);
   box-shadow: var(--light-glass-highlight);
@@ -1225,9 +1263,7 @@ body.ui-light button.toggle-see-more-btn {
 
 body.ui-light .theme-toggle:hover,
 body.ui-light .theme-option:hover,
-body.ui-light .light-button:hover,
-body.ui-light .subhead-contact:hover,
-body.ui-light button.toggle-see-more-btn:hover {
+body.ui-light .topnav .icon:hover {
   border-color: var(--light-glass-border);
   background: var(--light-glass-surface-soft);
   box-shadow: var(--light-glass-highlight), 0 9px 20px rgba(37, 68, 118, 0.14);
@@ -1295,12 +1331,6 @@ body.ui-light.theme-bird .form-container textarea:focus {
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-body.ui-light.theme-bird .contact.section .submit {
-  background: linear-gradient(135deg, #6f94da 0%, #4d73b8 100%);
-  border-color: rgba(211, 228, 252, 0.46);
-  color: #f2f7ff;
-}
-
 body.ui-dark .topnav,
 body.ui-dark .theme-modal,
 body.ui-dark .swiper-slide,
@@ -1352,10 +1382,7 @@ body.ui-dark .horizontal-tabs a:hover {
 
 body.ui-dark .theme-toggle,
 body.ui-dark .theme-option,
-body.ui-dark .topnav .icon,
-body.ui-dark .light-button,
-body.ui-dark .subhead-contact,
-body.ui-dark button.toggle-see-more-btn {
+body.ui-dark .topnav .icon {
   background: var(--glass-surface-subtle);
   border-color: var(--glass-border-soft);
   box-shadow: var(--glass-highlight);
@@ -1365,9 +1392,7 @@ body.ui-dark button.toggle-see-more-btn {
 
 body.ui-dark .theme-toggle:hover,
 body.ui-dark .theme-option:hover,
-body.ui-dark .light-button:hover,
-body.ui-dark .subhead-contact:hover,
-body.ui-dark button.toggle-see-more-btn:hover {
+body.ui-dark .topnav .icon:hover {
   border-color: var(--glass-border);
   background: var(--glass-surface-soft);
   box-shadow: var(--glass-highlight), 0 10px 22px rgba(0, 0, 0, 0.34);
@@ -1376,19 +1401,6 @@ body.ui-dark button.toggle-see-more-btn:hover {
 body.ui-dark .theme-option.active {
   border-color: var(--glass-border);
   box-shadow: var(--glass-highlight), 0 0 0 1px var(--glass-border);
-}
-
-body.ui-dark .dark-button,
-body.ui-dark .subhead-resume {
-  background: linear-gradient(135deg, rgba(165, 180, 205, 0.36) 0%, rgba(91, 106, 129, 0.64) 100%);
-  border-color: rgba(215, 224, 240, 0.3);
-  box-shadow: var(--glass-highlight), 0 14px 28px rgba(0, 0, 0, 0.38);
-}
-
-body.ui-dark .dark-button:hover,
-body.ui-dark .subhead-resume:hover {
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-highlight), 0 18px 36px rgba(0, 0, 0, 0.44);
 }
 
 body.ui-dark .featured-video {
