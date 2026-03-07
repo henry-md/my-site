@@ -11,3 +11,8 @@ Good to do
 Maybe later
 - what I do section
   - consider printing emailers sideways and taking screenshot like that
+
+
+To prompt
+- make sure gradient issue in testimonials is solved
+- Oh, somewhere along the way in this diff we lost the background animation of the projects. I want to avoid the bug of the jitter, but I definitely want to keep that animation where they scroll in from below. Please try to add that back in in a way that avoids an infinite jitter loop if one of the tabs is sticking out just barely near the top of the screen.

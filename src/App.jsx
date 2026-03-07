@@ -7,7 +7,12 @@ import CreepyEyeBackground from './components/CreepyEyeBackground.jsx';
 import Hexagon3dBackground from './components/Hexagon3dBackground.jsx';
 import BirdsBackground from './components/BirdsBackground.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
-import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI, MENU_BAR_STAYS_AT_TOP } from './constants.ts';
+import {
+  ABOVE_FOLD_TEXT_SHIMMERS,
+  DEBUG_UI,
+  liquid_glass_opacity,
+  MENU_BAR_STAYS_AT_TOP,
+} from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
 
 import VincentDemo from './assets/vincent-dunn-demo.mov';
@@ -30,6 +35,14 @@ const THEME_STORAGE_KEY = 'site-theme-id';
 const UI_MODE_STORAGE_KEY = 'ui-mode-pref-v2';
 const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
+const PROJECT_REVEAL_THRESHOLD = 0.12;
+const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
+const LIQUID_GLASS_ALPHA_STOPS = [
+  0.02, 0.04, 0.05, 0.08, 0.09, 0.1, 0.11, 0.14, 0.16, 0.2,
+  0.22, 0.24, 0.26, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4,
+  0.42, 0.44, 0.48, 0.54, 0.56, 0.6, 0.62, 0.66, 0.7, 0.72,
+  0.78,
+];
 
 function normalizeUiMode(value) {
   if (value === UI_LIGHT || value === UI_DARK) {
@@ -48,24 +61,39 @@ function FadeInSection(props) {
   const domRef = React.useRef(null);
 
   React.useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
+    if (isVisible) {
+      return undefined;
+    }
+
+    const node = domRef.current;
+    if (!node) {
+      return undefined;
+    }
+
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
+      setVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver((entries, instance) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          observer.unobserve(entry.target);
+          instance.unobserve(entry.target);
+          instance.disconnect();
         }
       });
+    }, {
+      threshold: PROJECT_REVEAL_THRESHOLD,
+      rootMargin: PROJECT_REVEAL_ROOT_MARGIN,
     });
 
-    const node = domRef.current;
-    if (node) {
-      observer.observe(node);
-    }
+    observer.observe(node);
 
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isVisible]);
 
   return (
     <div
@@ -105,6 +133,17 @@ function App() {
   const hexagon3dBackgroundEnabled = selectedTheme.canvasType === 'hexagon-3d';
   const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
   const birdsBackgroundEnabled = selectedTheme.canvasType === 'birds';
+
+  React.useEffect(() => {
+    const opacity = Math.max(0, Math.min(1, liquid_glass_opacity));
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty('--liquid-glass-opacity', String(opacity));
+    document.documentElement.classList.toggle('liquid-glass-opacity-zero', opacity <= 0.001);
+    LIQUID_GLASS_ALPHA_STOPS.forEach((baseValue) => {
+      const key = `--liquid-glass-alpha-${String(Math.round(baseValue * 100)).padStart(2, '0')}`;
+      rootStyle.setProperty(key, String(Number((baseValue * opacity).toFixed(4))));
+    });
+  }, []);
 
   React.useEffect(() => {
     const themeClassNames = BACKGROUND_CONFIGS.map((theme) => `theme-${theme.id}`);

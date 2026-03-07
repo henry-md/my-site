@@ -21,3 +21,7 @@ export const TESTIMONIAL_DESKTOP_BREAKPOINT_PX = 800;
 export const TESTIMONIAL_SPACE_BETWEEN_PX = 24;
 
 export const MOBILE_NAV_BREAKPOINT_PX = 900;
+
+// Global multiplier for all liquid-glass alpha stops.
+// 1 = current design; lower values are more transparent.
+export const liquid_glass_opacity = 0.2;
