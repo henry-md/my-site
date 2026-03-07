@@ -142,7 +142,7 @@ function App() {
   return (
     <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode}`}>
       {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
-      {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} /> : null}
+      {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} uiMode={activeUiMode} /> : null}
 
       <div className="topnav" id="myTopnav">
         <a href="#home" className="name" onClick={smoothScroll}>Henry Magnus Deutsch</a>
