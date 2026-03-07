@@ -5,6 +5,7 @@ import FeaturedProject from './components/FeaturedProject.jsx';
 import ContactForm from './components/ContactForm.jsx';
 import CreepyEyeBackground from './components/CreepyEyeBackground.jsx';
 import Hexagon3dBackground from './components/Hexagon3dBackground.jsx';
+import BirdsBackground from './components/BirdsBackground.jsx';
 import { toggle, smoothScroll } from './utils/general.js';
 import { ABOVE_FOLD_TEXT_SHIMMERS, DEBUG_UI } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
@@ -97,6 +98,7 @@ function App() {
   const activeUiMode = DEBUG_UI ? (uiModePreference || selectedTheme.uiMode) : UI_LIGHT;
   const hexagon3dBackgroundEnabled = selectedTheme.canvasType === 'hexagon-3d';
   const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
+  const birdsBackgroundEnabled = selectedTheme.canvasType === 'birds';
 
   React.useEffect(() => {
     const themeClassNames = BACKGROUND_CONFIGS.map((theme) => `theme-${theme.id}`);
@@ -143,6 +145,7 @@ function App() {
     <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode}`}>
       {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
       {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} uiMode={activeUiMode} /> : null}
+      {birdsBackgroundEnabled ? <BirdsBackground opacity={selectedTheme.canvasOpacity} /> : null}
 
       <div className="topnav" id="myTopnav">
         <a href="#home" className="name" onClick={smoothScroll}>Henry Magnus Deutsch</a>

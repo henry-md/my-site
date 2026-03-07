@@ -4,7 +4,7 @@ export type BackgroundConfig = {
   id: string;
   label: string;
   uiMode: UiMode;
-  canvasType: 'creepy-eye' | 'hexagon-3d';
+  canvasType: 'creepy-eye' | 'hexagon-3d' | 'birds';
   canvasOpacity: number;
 };
 
@@ -23,6 +23,13 @@ export const BACKGROUND_CONFIGS: BackgroundConfig[] = [
     canvasType: 'hexagon-3d',
     canvasOpacity: 1,
   },
+  {
+    id: 'bird',
+    label: 'bird',
+    uiMode: 'light',
+    canvasType: 'birds',
+    canvasOpacity: 1,
+  },
 ];
 
-export const DEFAULT_BACKGROUND_ID = 'hexagon-3d';
+export const DEFAULT_BACKGROUND_ID = 'bird';
