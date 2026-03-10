@@ -50,12 +50,12 @@ DARK_BLUE_PROFILE_PHOTO_HEX = "0b1769"  # Plusses + lower-left striped shape
 LIGHT_BLUE_PROFILE_PHOTO_HEX = "3144b3" # Blue square behind the gradient panel
 # Horizontal gradient controls (0.0 = left edge, 1.0 = right edge).
 RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX = RED_PROFILE_PHOTO_HEX
-RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.9
+RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.7
 
 # Master animation duration. All internal checkpoints scale from this value.
 # Actual frame count is computed as: round(fps * duration_seconds).
 PROFILE_PHOTO_ANIMATION_FPS = 24
-PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 0.5
+PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 4
 
 # Hatch tuning (in screen-pixel units for the ortho camera setup).
 HATCH_LINE_WIDTH_PX = 2.0
@@ -90,8 +90,8 @@ PLUS_ANIMATION_RANDOM_SEED = 29
 
 # Plus layout controls (screen-space px at 1000x1007 reference geometry).
 # "Length" here is the square footprint of each plus icon (width == height).
-WHITE_PLUS_SIZE_PX = 30.0
-BLUE_PLUS_SIZE_PX = 29.0
+WHITE_PLUS_SIZE_PX = 32.0
+BLUE_PLUS_SIZE_PX = 32.0
 WHITE_PLUS_THICKNESS_PX = 6.0
 BLUE_PLUS_THICKNESS_PX = 7.0
 WHITE_PLUS_COL_GAP_PX = 39.0
@@ -101,6 +101,12 @@ BLUE_PLUS_ROW_GAP_PX = 38.5
 # Top offsets are measured from the red panel top edge (MAIN_RECT["top"]).
 WHITE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX = 206.0
 BLUE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX = 321.5
+
+# Quarter-circle outline icon radii (px).
+TOP_LEFT_CORNER_ICON_INNER_RADIUS_PX = 60.0
+TOP_LEFT_CORNER_ICON_OUTER_RADIUS_PX = 111.0
+BOTTOM_RIGHT_CORNER_ICON_INNER_RADIUS_PX = 60.0
+BOTTOM_RIGHT_CORNER_ICON_OUTER_RADIUS_PX = 111.0
 
 
 def parse_blender_args() -> argparse.Namespace:
@@ -1566,8 +1572,8 @@ def build_layers(
         "TopLeftIcon",
         cx=39,
         cy=141,
-        inner_radius=73,
-        outer_radius=111,
+        inner_radius=TOP_LEFT_CORNER_ICON_INNER_RADIUS_PX,
+        outer_radius=TOP_LEFT_CORNER_ICON_OUTER_RADIUS_PX,
         stroke_width=3,
         segments=64,
         z=-0.05,
@@ -1584,8 +1590,8 @@ def build_layers(
         "BottomRightIcon",
         cx=887,
         cy=832,
-        inner_radius=73,
-        outer_radius=111,
+        inner_radius=BOTTOM_RIGHT_CORNER_ICON_INNER_RADIUS_PX,
+        outer_radius=BOTTOM_RIGHT_CORNER_ICON_OUTER_RADIUS_PX,
         stroke_width=3,
         segments=72,
         z=-0.22,
