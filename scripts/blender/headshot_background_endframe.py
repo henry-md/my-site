@@ -55,11 +55,11 @@ RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.9
 # Master animation duration. All internal checkpoints scale from this value.
 # Actual frame count is computed as: round(fps * duration_seconds).
 PROFILE_PHOTO_ANIMATION_FPS = 24
-PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 3.0
+PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 4.0
 
 # Hatch tuning (in screen-pixel units for the ortho camera setup).
-HATCH_LINE_WIDTH_PX = 4.0
-HATCH_LINE_SPACING_PX = 15.0
+HATCH_LINE_WIDTH_PX = 2.0
+HATCH_LINE_SPACING_PX = 11.0
 HATCH_LINE_ANGLE_DEG = 45.0  # Lower-left to upper-right in screen space.
 HATCH_LINE_ENDPOINT_INSET_PX = HATCH_LINE_WIDTH_PX * 0.5
 
@@ -68,14 +68,18 @@ HATCH_BLOCK_LEFT = 0.0
 HATCH_BLOCK_TOP = 836.0
 HATCH_BLOCK_RIGHT = 450.0
 HATCH_BLOCK_BOTTOM = 1007.0
-HATCH_BLOCK_RADIUS_TOP_LEFT_PX = 0.0
+HATCH_BLOCK_RADIUS_TOP_LEFT_PX = 10
 HATCH_BLOCK_RADIUS_TOP_RIGHT_HEIGHT_RATIO = 0.5
 HATCH_BLOCK_RADIUS_BOTTOM_RIGHT_HEIGHT_RATIO = 0.5
 HATCH_BLOCK_RADIUS_BOTTOM_LEFT_PX = 70.0
 HATCH_BLOCK_CORNER_SEGMENTS = 30
-HATCH_DRAW_START_PROGRESS = 0.10
-HATCH_DRAW_END_PROGRESS = 0.88
-HATCH_RANDOM_SEED = 17
+# Hatch animation now runs across the full master timeline.
+HATCH_DRAW_START_PROGRESS = 0.0
+HATCH_DRAW_END_PROGRESS = 1.0
+# Integer seed controlling random start-position per line segment.
+HATCH_DRAW_ORIGIN_SEED = 17
+# Backward-compatible alias (used by older helpers).
+HATCH_RANDOM_SEED = HATCH_DRAW_ORIGIN_SEED
 
 
 def parse_blender_args() -> argparse.Namespace:
@@ -1188,7 +1192,7 @@ def set_curve_draw_linear(obj: bpy.types.Object) -> None:
     if not hasattr(action, "fcurves"):
         return
     for fcurve in action.fcurves:
-        if fcurve.data_path != "bevel_factor_end":
+        if fcurve.data_path not in {"bevel_factor_start", "bevel_factor_end"}:
             continue
         for key in fcurve.keyframe_points:
             key.interpolation = "LINEAR"
@@ -1256,6 +1260,63 @@ def animate_curve_draw_randomized(
     rng = random.Random(seed)
     rng.shuffle(shuffled)
     animate_curve_draw_sequential(shuffled, start_frame, end_frame)
+
+
+def animate_curve_draw_center_out_random_origin(
+    curve_strokes: Sequence[Tuple[bpy.types.Object, float]],
+    start_frame: float,
+    end_frame: float,
+    seed: int,
+) -> None:
+    if not curve_strokes:
+        return
+
+    draw_end = max(start_frame + 0.001, end_frame)
+    rng = random.Random(seed)
+
+    for obj, line_length in curve_strokes:
+        curve_data = obj.data
+        if not isinstance(curve_data, bpy.types.Curve):
+            continue
+
+        center = max(0.0, min(1.0, rng.random()))
+        dot_half_span = 0.0
+        if line_length > 1e-6:
+            # Start with a tiny visible capsule so frame 1 looks like a dot.
+            dot_half_span = min(0.49, max(1e-4, (HATCH_LINE_WIDTH_PX * 0.15) / line_length))
+
+        start_factor = max(0.0, center - dot_half_span)
+        end_factor = min(1.0, center + dot_half_span)
+        left_span = center
+        right_span = 1.0 - center
+        max_span = max(left_span, right_span)
+        min_span = min(left_span, right_span)
+
+        # Animate both bevel factors so growth always exposes two rounded tips.
+        curve_data.bevel_factor_mapping_start = "SPLINE"
+        curve_data.bevel_factor_mapping_end = "SPLINE"
+        curve_data.bevel_factor_start = start_factor
+        curve_data.bevel_factor_end = end_factor
+        curve_data.keyframe_insert(data_path="bevel_factor_start", frame=start_frame)
+        curve_data.keyframe_insert(data_path="bevel_factor_end", frame=start_frame)
+
+        if max_span > 1e-6 and min_span > 1e-6 and (min_span / max_span) < 0.999:
+            hit_progress = min_span / max_span
+            hit_frame = start_frame + ((draw_end - start_frame) * hit_progress)
+            if left_span <= right_span:
+                curve_data.bevel_factor_start = 0.0
+                curve_data.bevel_factor_end = min(1.0, center + min_span)
+            else:
+                curve_data.bevel_factor_start = max(0.0, center - min_span)
+                curve_data.bevel_factor_end = 1.0
+            curve_data.keyframe_insert(data_path="bevel_factor_start", frame=hit_frame)
+            curve_data.keyframe_insert(data_path="bevel_factor_end", frame=hit_frame)
+
+        curve_data.bevel_factor_start = 0.0
+        curve_data.bevel_factor_end = 1.0
+        curve_data.keyframe_insert(data_path="bevel_factor_start", frame=draw_end)
+        curve_data.keyframe_insert(data_path="bevel_factor_end", frame=draw_end)
+        set_curve_draw_linear(obj)
 
 
 def animate_object_visible_at(obj: bpy.types.Object, visible_frame: float) -> None:
@@ -1670,28 +1731,14 @@ def build_layers(
         line_angle_deg=HATCH_LINE_ANGLE_DEG,
         endpoint_inset_px=HATCH_LINE_ENDPOINT_INSET_PX,
     )
-    hatch_rng = random.Random(HATCH_RANDOM_SEED)
-    cap_radius = max(0.5, HATCH_LINE_WIDTH_PX * 0.5)
-    hatch_strokes: List[Tuple[bpy.types.Object, float, bpy.types.Object, bpy.types.Object]] = []
+    hatch_strokes: List[Tuple[bpy.types.Object, float]] = []
     for idx, (seg_start, seg_end, seg_len) in enumerate(hatch_segments):
-        if seg_len <= HATCH_LINE_WIDTH_PX:
+        if seg_len <= max(1.0, HATCH_LINE_WIDTH_PX):
             continue
-        if hatch_rng.random() < 0.5:
-            draw_start = seg_start
-            draw_end = seg_end
-        else:
-            draw_start = seg_end
-            draw_end = seg_start
-
-        ux = (draw_end[0] - draw_start[0]) / max(1e-6, seg_len)
-        uy = (draw_end[1] - draw_start[1]) / max(1e-6, seg_len)
-        body_start = (draw_start[0] + (ux * cap_radius), draw_start[1] + (uy * cap_radius))
-        body_end = (draw_end[0] - (ux * cap_radius), draw_end[1] - (uy * cap_radius))
-        body_len = max(0.001, seg_len - (cap_radius * 2.0))
 
         line_obj = add_polyline_stroke_curve(
             name=f"BottomLeftHatchLine_{idx:03d}",
-            points_screen=[body_start, body_end],
+            points_screen=[seg_start, seg_end],
             stroke_width=HATCH_LINE_WIDTH_PX,
             z=-0.05,
             frame_width=frame_width,
@@ -1702,46 +1749,16 @@ def build_layers(
             material=blue_foreground_mat,
             collection=overlay_coll,
         )
-
-        start_cap = add_polygon_object(
-            name=f"BottomLeftHatchStartCap_{idx:03d}",
-            points_screen=ellipse_points_screen(draw_start[0], draw_start[1], cap_radius, cap_radius, segments=26),
-            z=-0.05,
-            frame_width=frame_width,
-            frame_height=frame_height,
-            sx=sx,
-            sy=sy,
-            material=blue_foreground_mat,
-            collection=overlay_coll,
-        )
-        end_cap = add_polygon_object(
-            name=f"BottomLeftHatchEndCap_{idx:03d}",
-            points_screen=ellipse_points_screen(draw_end[0], draw_end[1], cap_radius, cap_radius, segments=26),
-            z=-0.05,
-            frame_width=frame_width,
-            frame_height=frame_height,
-            sx=sx,
-            sy=sy,
-            material=blue_foreground_mat,
-            collection=overlay_coll,
-        )
-        hatch_strokes.append((line_obj, body_len, start_cap, end_cap))
+        hatch_strokes.append((line_obj, seg_len))
 
     hatch_start_frame = frame_from_progress(animation_total_frames, HATCH_DRAW_START_PROGRESS)
     hatch_end_frame = frame_from_progress(animation_total_frames, HATCH_DRAW_END_PROGRESS)
-    hatch_draw_order = list(hatch_strokes)
-    hatch_rng.shuffle(hatch_draw_order)
-    hatch_curve_windows = curve_draw_windows(
-        [(line_obj, line_len) for line_obj, line_len, _, _ in hatch_draw_order],
+    animate_curve_draw_center_out_random_origin(
+        hatch_strokes,
         start_frame=hatch_start_frame,
         end_frame=hatch_end_frame,
+        seed=HATCH_DRAW_ORIGIN_SEED,
     )
-    for line_obj, seg_start_frame, seg_end_frame in hatch_curve_windows:
-        animate_curve_draw([line_obj], seg_start_frame, seg_end_frame)
-
-    for (_, seg_start_frame, seg_end_frame), (_, _, start_cap, end_cap) in zip(hatch_curve_windows, hatch_draw_order):
-        animate_object_visible_at(start_cap, seg_start_frame)
-        animate_object_visible_at(end_cap, seg_end_frame)
 
     # Subject lighting overlays on top layer.
     add_ellipse_glow(
