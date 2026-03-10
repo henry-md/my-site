@@ -38,19 +38,30 @@ BASE_HEIGHT = 1007
 PROFILE_PHOTO_PANEL_CORNER_RADIUS = 6.0
 MAIN_RECT = {"left": 24, "top": 130, "right": 914, "bottom": 964}
 # Blue plate base geometry before profile-photo offset is applied.
-BLUE_BACK = {"left": 24, "top": 130, "right": 928, "bottom": 974}
-# Positive values move the blue square right/down in screen space.
-# Defaults preserve the current rendered placement.
-X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO = 2.0
-Y_OFFSET_BLUE_PROFILE_PHOTO = 24.0
+BLUE_BACK = {
+    "left": MAIN_RECT["left"],
+    "top": MAIN_RECT["top"],
+    "right": MAIN_RECT["right"],
+    "bottom": MAIN_RECT["bottom"],
+}
+# Positive values move the red panel right/down in screen space.
+X_OFFSET_RED_PANEL_PROFILE_PHOTO = 0.0
+Y_OFFSET_RED_PANEL_PROFILE_PHOTO = 0.0
+# Positive values move the blue square right/down relative to the red panel.
+# When X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO is 0, both panels are horizontally aligned.
+X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO = 13.0
+Y_OFFSET_BLUE_PROFILE_PHOTO = 28.0
 
 # Profile-photo palette controls.
-RED_PROFILE_PHOTO_HEX = "A20F10"        # Most saturated red (gradient right side + red quarter-circle icon)
+# Horizontal gradient controls (0.0 = left edge, 1.0 = right edge).
+RED_GRADIENT_START_COLOR_PROFILE_PHOTO_HEX = "ffe1e1"
+RED_GRADIENT_MIDDLE_STOP_PROFILE_PHOTO = .5
+RED_GRADIENT_MIDDLE_COLOR_PROFILE_PHOTO_HEX = "e59694"
+RED_GRADIENT_END_STOP_PROFILE_PHOTO = 1.0
+RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX = "e53935"  # Most saturated red (gradient right side + red quarter-circle icon)
 DARK_BLUE_PROFILE_PHOTO_HEX = "0b1769"  # Plusses + lower-left striped shape
 LIGHT_BLUE_PROFILE_PHOTO_HEX = "3144b3" # Blue square behind the gradient panel
-# Horizontal gradient controls (0.0 = left edge, 1.0 = right edge).
-RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX = RED_PROFILE_PHOTO_HEX
-RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.7
+
 
 # Master animation duration. All internal checkpoints scale from this value.
 # Actual frame count is computed as: round(fps * duration_seconds).
@@ -78,8 +89,6 @@ HATCH_DRAW_START_PROGRESS = 0.0
 HATCH_DRAW_END_PROGRESS = 1.0
 # Integer seed controlling random start-position per line segment.
 HATCH_DRAW_ORIGIN_SEED = 17
-# Backward-compatible alias (used by older helpers).
-HATCH_RANDOM_SEED = HATCH_DRAW_ORIGIN_SEED
 
 # Plus draw animation controls.
 # Portion of the full timeline each plus can consume (both strokes combined).
@@ -148,6 +157,23 @@ def hex_to_rgba(value: str, alpha: float = 1.0) -> Tuple[float, float, float, fl
     g = int(value[2:4], 16) / 255.0
     b = int(value[4:6], 16) / 255.0
     return (r, g, b, alpha)
+
+
+def srgb_channel_to_scene_linear(channel: float) -> float:
+    c = max(0.0, min(1.0, channel))
+    if c <= 0.04045:
+        return c / 12.92
+    return ((c + 0.055) / 1.055) ** 2.4
+
+
+def hex_to_rgba_scene_linear(value: str, alpha: float = 1.0) -> Tuple[float, float, float, float]:
+    srgb = hex_to_rgba(value, alpha)
+    return (
+        srgb_channel_to_scene_linear(srgb[0]),
+        srgb_channel_to_scene_linear(srgb[1]),
+        srgb_channel_to_scene_linear(srgb[2]),
+        srgb[3],
+    )
 
 
 def clear_scene() -> None:
@@ -266,19 +292,26 @@ def make_horizontal_gradient_material(name: str) -> bpy.types.Material:
     mapping.inputs["Rotation"].default_value = (0.0, 0.0, 0.0)
 
     cr = ramp.color_ramp
+    cr.interpolation = "LINEAR"
     end_pos = max(0.001, min(1.0, RED_GRADIENT_END_STOP_PROFILE_PHOTO))
-    end_color = hex_to_rgba(RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX, 1.0)
+    mid_pos_raw = max(0.0, min(1.0, RED_GRADIENT_MIDDLE_STOP_PROFILE_PHOTO))
+    eps = 0.001
+    start_color = hex_to_rgba_scene_linear(RED_GRADIENT_START_COLOR_PROFILE_PHOTO_HEX, 1.0)
+    mid_color = hex_to_rgba_scene_linear(RED_GRADIENT_MIDDLE_COLOR_PROFILE_PHOTO_HEX, 1.0)
+    end_color = hex_to_rgba_scene_linear(RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX, 1.0)
 
     cr.elements[0].position = 0.0
-    cr.elements[0].color = hex_to_rgba("e8d3d5", 1.0)
-    cr.elements[1].position = end_pos
-    cr.elements[1].color = end_color
-
-    # Keep the midpoint hue while scaling to shorter/longer red endpoints.
-    if end_pos > 0.002:
-        mid_pos = max(0.001, min(end_pos - 0.001, end_pos * 0.58))
-        mid = cr.elements.new(mid_pos)
-        mid.color = hex_to_rgba("e58f9f", 1.0)
+    cr.elements[0].color = start_color
+    if end_pos <= (eps * 2.0):
+        # Degenerate case: not enough room for a distinct middle stop.
+        cr.elements[1].position = end_pos
+        cr.elements[1].color = end_color
+    else:
+        mid_pos = max(eps, min(end_pos - eps, mid_pos_raw))
+        cr.elements[1].position = mid_pos
+        cr.elements[1].color = mid_color
+        end_el = cr.elements.new(end_pos)
+        end_el.color = end_color
 
     # CSS-like stop behavior: hold full red from end stop to the panel edge.
     if end_pos < 0.999:
@@ -1519,7 +1552,7 @@ def build_layers(
     blue_back_mat = make_flat_material("BlueBackMat", hex_to_rgba(LIGHT_BLUE_PROFILE_PHOTO_HEX, 0.17))
     blue_foreground_mat = make_flat_material("BlueForegroundMat", hex_to_rgba(DARK_BLUE_PROFILE_PHOTO_HEX, 1.0))
     white_mat = make_flat_material("WhiteMat", hex_to_rgba("ffffff", 1.0))
-    red_mat = make_flat_material("RedMat", hex_to_rgba(RED_PROFILE_PHOTO_HEX, 1.0))
+    red_mat = make_flat_material("RedMat", hex_to_rgba_scene_linear(RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX, 1.0))
     main_gradient_mat = make_horizontal_gradient_material("MainGradientMat")
     warm_glow_mat = make_image_glow_material(
         "WarmGlowMat",
@@ -1535,12 +1568,17 @@ def build_layers(
     )
 
     # Backdrop layer (pure card/background accents, no front decoration).
+    red_panel_x = X_OFFSET_RED_PANEL_PROFILE_PHOTO
+    red_panel_y = Y_OFFSET_RED_PANEL_PROFILE_PHOTO
+    blue_panel_x = red_panel_x + X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO
+    blue_panel_y = red_panel_y + Y_OFFSET_BLUE_PROFILE_PHOTO
+
     add_rounded_rect(
         "MainPanel",
-        MAIN_RECT["left"],
-        MAIN_RECT["top"],
-        MAIN_RECT["right"],
-        MAIN_RECT["bottom"],
+        MAIN_RECT["left"] + red_panel_x,
+        MAIN_RECT["top"] + red_panel_y,
+        MAIN_RECT["right"] + red_panel_x,
+        MAIN_RECT["bottom"] + red_panel_y,
         PROFILE_PHOTO_PANEL_CORNER_RADIUS,
         -0.20,
         frame_width,
@@ -1553,10 +1591,10 @@ def build_layers(
 
     add_rounded_rect(
         "BlueBackPlate",
-        BLUE_BACK["left"] + X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO,
-        BLUE_BACK["top"] + Y_OFFSET_BLUE_PROFILE_PHOTO,
-        BLUE_BACK["right"] + X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO,
-        BLUE_BACK["bottom"] + Y_OFFSET_BLUE_PROFILE_PHOTO,
+        BLUE_BACK["left"] + blue_panel_x,
+        BLUE_BACK["top"] + blue_panel_y,
+        BLUE_BACK["right"] + blue_panel_x,
+        BLUE_BACK["bottom"] + blue_panel_y,
         PROFILE_PHOTO_PANEL_CORNER_RADIUS,
         -0.24,
         frame_width,
