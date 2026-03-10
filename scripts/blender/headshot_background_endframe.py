@@ -17,6 +17,8 @@ from __future__ import annotations
 
 import argparse
 import math
+import random
+import re
 import shutil
 import subprocess
 import sys
@@ -33,9 +35,10 @@ BASE_WIDTH = 1000
 BASE_HEIGHT = 1007
 
 # Geometry measured from the target artwork at 1000x1007.
-MAIN_RECT = {"left": 24, "top": 130, "right": 914, "bottom": 964, "radius": 6}
+PROFILE_PHOTO_PANEL_CORNER_RADIUS = 6.0
+MAIN_RECT = {"left": 24, "top": 130, "right": 914, "bottom": 964}
 # Blue plate base geometry before profile-photo offset is applied.
-BLUE_BACK = {"left": 24, "top": 130, "right": 928, "bottom": 974, "radius": 0}
+BLUE_BACK = {"left": 24, "top": 130, "right": 928, "bottom": 974}
 # Positive values move the blue square right/down in screen space.
 # Defaults preserve the current rendered placement.
 X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO = 2.0
@@ -50,11 +53,29 @@ RED_GRADIENT_END_COLOR_PROFILE_PHOTO_HEX = RED_PROFILE_PHOTO_HEX
 RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.9
 
 # Master animation duration. All internal checkpoints scale from this value.
-PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 10.0 # 10 seconds requires 240 frames
+# Actual frame count is computed as: round(fps * duration_seconds).
+PROFILE_PHOTO_ANIMATION_FPS = 24
+PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 3.0
 
 # Hatch tuning (in screen-pixel units for the ortho camera setup).
 HATCH_LINE_WIDTH_PX = 4.0
 HATCH_LINE_SPACING_PX = 15.0
+HATCH_LINE_ANGLE_DEG = 45.0  # Lower-left to upper-right in screen space.
+HATCH_LINE_ENDPOINT_INSET_PX = HATCH_LINE_WIDTH_PX * 0.5
+
+# Hatch cutout geometry and animation controls.
+HATCH_BLOCK_LEFT = 0.0
+HATCH_BLOCK_TOP = 836.0
+HATCH_BLOCK_RIGHT = 450.0
+HATCH_BLOCK_BOTTOM = 1007.0
+HATCH_BLOCK_RADIUS_TOP_LEFT_PX = 0.0
+HATCH_BLOCK_RADIUS_TOP_RIGHT_HEIGHT_RATIO = 0.5
+HATCH_BLOCK_RADIUS_BOTTOM_RIGHT_HEIGHT_RATIO = 0.5
+HATCH_BLOCK_RADIUS_BOTTOM_LEFT_PX = 70.0
+HATCH_BLOCK_CORNER_SEGMENTS = 30
+HATCH_DRAW_START_PROGRESS = 0.10
+HATCH_DRAW_END_PROGRESS = 0.88
+HATCH_RANDOM_SEED = 17
 
 
 def parse_blender_args() -> argparse.Namespace:
@@ -65,7 +86,7 @@ def parse_blender_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=Path("public/generated/headshot-bg"))
     parser.add_argument("--frame-width", type=int, default=BASE_WIDTH)
     parser.add_argument("--frame-height", type=int, default=BASE_HEIGHT)
-    parser.add_argument("--fps", type=int, default=24)
+    parser.add_argument("--fps", type=int, default=PROFILE_PHOTO_ANIMATION_FPS)
     parser.add_argument("--duration-seconds", type=float, default=PROFILE_PHOTO_ANIMATION_DURATION_SECONDS)
 
     parser.add_argument("--backdrop-still-name", type=str, default="headshot-bg-backdrop.png")
@@ -242,33 +263,6 @@ def make_horizontal_gradient_material(name: str) -> bpy.types.Material:
     return mat
 
 
-def ensure_hatch_pattern_image(name: str, size: int = 128, line_px: int = 4, gap_px: int = 30) -> bpy.types.Image:
-    existing = bpy.data.images.get(name)
-    if existing and existing.size[0] == size and existing.size[1] == size:
-        return existing
-    if existing:
-        bpy.data.images.remove(existing)
-
-    img = bpy.data.images.new(name=name, width=size, height=size, alpha=True)
-    pixels = [0.0] * (size * size * 4)
-    period = max(1, line_px + gap_px)
-
-    for y in range(size):
-        for x in range(size):
-            idx = (y * size + x) * 4
-            # Keep stripes at a true 45deg in texture space.
-            active = ((x - y) % period) < line_px
-            alpha = 1.0 if active else 0.0
-            pixels[idx + 0] = 1.0
-            pixels[idx + 1] = 1.0
-            pixels[idx + 2] = 1.0
-            pixels[idx + 3] = alpha
-
-    img.pixels.foreach_set(pixels)
-    img.pack()
-    return img
-
-
 def ensure_radial_alpha_image(name: str, size: int = 384, falloff_power: float = 1.85) -> bpy.types.Image:
     existing = bpy.data.images.get(name)
     if existing and existing.size[0] == size and existing.size[1] == size:
@@ -297,62 +291,6 @@ def ensure_radial_alpha_image(name: str, size: int = 384, falloff_power: float =
     img.pixels.foreach_set(pixels)
     img.pack()
     return img
-
-
-def make_hatch_material(name: str) -> bpy.types.Material:
-    mat = bpy.data.materials.new(name=name)
-    mat.use_nodes = True
-    mat.blend_method = "BLEND"
-    if hasattr(mat, "shadow_method"):
-        mat.shadow_method = "NONE"
-
-    nodes = mat.node_tree.nodes
-    links = mat.node_tree.links
-    nodes.clear()
-
-    out = nodes.new(type="ShaderNodeOutputMaterial")
-    transparent = nodes.new(type="ShaderNodeBsdfTransparent")
-    emission = nodes.new(type="ShaderNodeEmission")
-    mix = nodes.new(type="ShaderNodeMixShader")
-
-    tex_coord = nodes.new(type="ShaderNodeTexCoord")
-    mapping = nodes.new(type="ShaderNodeMapping")
-    separate = nodes.new(type="ShaderNodeSeparateXYZ")
-    stripe_axis = nodes.new(type="ShaderNodeMath")
-    period_div = nodes.new(type="ShaderNodeMath")
-    frac = nodes.new(type="ShaderNodeMath")
-    stripe_mask = nodes.new(type="ShaderNodeMath")
-
-    # Use object space to avoid UV seams and keep line direction stable.
-    mapping.inputs["Scale"].default_value = (1.0, 1.0, 1.0)
-    stripe_axis.operation = "SUBTRACT"  # x - y => 45deg up-right stripes.
-
-    # Pixel-like spacing because 1 world unit == 1 screen pixel in this ortho setup.
-    line_px = HATCH_LINE_WIDTH_PX
-    period_px = max(line_px + 1.0, HATCH_LINE_SPACING_PX)
-    period_div.operation = "DIVIDE"
-    period_div.inputs[1].default_value = period_px
-
-    frac.operation = "FRACT"
-    stripe_mask.operation = "LESS_THAN"
-    stripe_mask.inputs[1].default_value = line_px / period_px
-
-    emission.inputs["Color"].default_value = hex_to_rgba(DARK_BLUE_PROFILE_PHOTO_HEX, 1.0)
-    emission.inputs["Strength"].default_value = 1.0
-
-    links.new(tex_coord.outputs["Object"], mapping.inputs["Vector"])
-    links.new(mapping.outputs["Vector"], separate.inputs["Vector"])
-    links.new(separate.outputs["X"], stripe_axis.inputs[0])
-    links.new(separate.outputs["Y"], stripe_axis.inputs[1])
-    links.new(stripe_axis.outputs["Value"], period_div.inputs[0])
-    links.new(period_div.outputs["Value"], frac.inputs[0])
-    links.new(frac.outputs["Value"], stripe_mask.inputs[0])
-    links.new(stripe_mask.outputs["Value"], mix.inputs["Fac"])
-    links.new(transparent.outputs["BSDF"], mix.inputs[1])
-    links.new(emission.outputs["Emission"], mix.inputs[2])
-    links.new(mix.outputs["Shader"], out.inputs["Surface"])
-
-    return mat
 
 
 def make_image_glow_material(
@@ -540,6 +478,177 @@ def hatch_block_points_screen(
     return points
 
 
+def rounded_rect_per_corner_points_screen(
+    left: float,
+    top: float,
+    right: float,
+    bottom: float,
+    radius_top_left: float,
+    radius_top_right: float,
+    radius_bottom_right: float,
+    radius_bottom_left: float,
+    segments: int = 16,
+) -> List[Tuple[float, float]]:
+    width = max(0.0, right - left)
+    height = max(0.0, bottom - top)
+    max_r = min(width * 0.5, height * 0.5)
+
+    rtl = max(0.0, min(radius_top_left, max_r))
+    rtr = max(0.0, min(radius_top_right, max_r))
+    rbr = max(0.0, min(radius_bottom_right, max_r))
+    rbl = max(0.0, min(radius_bottom_left, max_r))
+
+    points: List[Tuple[float, float]] = []
+
+    def append_unique(pt: Tuple[float, float]) -> None:
+        if not points:
+            points.append(pt)
+            return
+        dx = points[-1][0] - pt[0]
+        dy = points[-1][1] - pt[1]
+        if (dx * dx) + (dy * dy) > 1e-10:
+            points.append(pt)
+
+    append_unique((left + rtl, top) if rtl > 0.0 else (left, top))
+    append_unique((right - rtr, top) if rtr > 0.0 else (right, top))
+    if rtr > 0.0:
+        for pt in arc_points_screen(right - rtr, top + rtr, rtr, 270.0, 360.0, segments)[1:]:
+            append_unique(pt)
+
+    append_unique((right, bottom - rbr) if rbr > 0.0 else (right, bottom))
+    if rbr > 0.0:
+        for pt in arc_points_screen(right - rbr, bottom - rbr, rbr, 0.0, 90.0, segments)[1:]:
+            append_unique(pt)
+
+    append_unique((left + rbl, bottom) if rbl > 0.0 else (left, bottom))
+    if rbl > 0.0:
+        for pt in arc_points_screen(left + rbl, bottom - rbl, rbl, 90.0, 180.0, segments)[1:]:
+            append_unique(pt)
+
+    append_unique((left, top + rtl) if rtl > 0.0 else (left, top))
+    if rtl > 0.0:
+        for pt in arc_points_screen(left + rtl, top + rtl, rtl, 180.0, 270.0, segments)[1:]:
+            append_unique(pt)
+
+    if points:
+        append_unique(points[0])
+    return points
+
+
+def hatch_segments_in_polygon_screen(
+    polygon_points: Sequence[Tuple[float, float]],
+    spacing_px: float,
+    line_angle_deg: float = HATCH_LINE_ANGLE_DEG,
+    endpoint_inset_px: float = 0.0,
+) -> List[Tuple[Tuple[float, float], Tuple[float, float], float]]:
+    if len(polygon_points) < 3:
+        return []
+
+    polygon = list(polygon_points)
+    if len(polygon) >= 2:
+        dx = polygon[0][0] - polygon[-1][0]
+        dy = polygon[0][1] - polygon[-1][1]
+        if (dx * dx) + (dy * dy) <= 1e-10:
+            polygon = polygon[:-1]
+    if len(polygon) < 3:
+        return []
+
+    angle_rad = math.radians(float(line_angle_deg))
+    dir_x = math.cos(angle_rad)
+    dir_y = -math.sin(angle_rad)  # Screen space uses +Y downward.
+    normal_x = -dir_y
+    normal_y = dir_x
+
+    dir_len = math.hypot(dir_x, dir_y)
+    if dir_len <= 1e-9:
+        return []
+    dir_x /= dir_len
+    dir_y /= dir_len
+
+    normal_len = math.hypot(normal_x, normal_y)
+    if normal_len <= 1e-9:
+        return []
+    normal_x /= normal_len
+    normal_y /= normal_len
+
+    def dot_normal(pt: Tuple[float, float]) -> float:
+        return (pt[0] * normal_x) + (pt[1] * normal_y)
+
+    def dot_direction(pt: Tuple[float, float]) -> float:
+        return (pt[0] * dir_x) + (pt[1] * dir_y)
+
+    def intersect_edge(
+        p0: Tuple[float, float],
+        p1: Tuple[float, float],
+        c_value: float,
+    ) -> Optional[Tuple[float, float]]:
+        x0, y0 = p0
+        x1, y1 = p1
+        dx = x1 - x0
+        dy = y1 - y0
+        denom = (dx * normal_x) + (dy * normal_y)
+        if abs(denom) < 1e-9:
+            return None
+        t = (c_value - dot_normal(p0)) / denom
+        if t < -1e-9 or t > 1.0 + 1e-9:
+            return None
+        t = max(0.0, min(1.0, t))
+        return (x0 + (t * dx), y0 + (t * dy))
+
+    spacing = max(1.0, float(spacing_px))
+    endpoint_inset = max(0.0, float(endpoint_inset_px))
+    c_values = [dot_normal(pt) for pt in polygon]
+    c_min = min(c_values)
+    c_max = max(c_values)
+
+    c = math.floor((c_min - spacing) / spacing) * spacing
+    c_end = math.ceil((c_max + spacing) / spacing) * spacing
+
+    segments: List[Tuple[Tuple[float, float], Tuple[float, float], float]] = []
+    while c <= (c_end + 1e-6):
+        intersections: List[Tuple[float, float]] = []
+        for idx in range(len(polygon)):
+            p0 = polygon[idx]
+            p1 = polygon[(idx + 1) % len(polygon)]
+            hit = intersect_edge(p0, p1, c)
+            if hit is None:
+                continue
+            duplicate = False
+            for qx, qy in intersections:
+                dx = hit[0] - qx
+                dy = hit[1] - qy
+                if (dx * dx) + (dy * dy) <= 1e-6:
+                    duplicate = True
+                    break
+            if not duplicate:
+                intersections.append(hit)
+
+        if len(intersections) >= 2:
+            intersections.sort(key=dot_direction)
+            p_start = intersections[0]
+            p_end = intersections[-1]
+            seg_len = math.hypot(p_end[0] - p_start[0], p_end[1] - p_start[1])
+            if seg_len <= max(1.0, HATCH_LINE_WIDTH_PX):
+                c += spacing
+                continue
+
+            if endpoint_inset > 0.0:
+                if seg_len <= (endpoint_inset * 2.0) + 1e-6:
+                    c += spacing
+                    continue
+                ux = (p_end[0] - p_start[0]) / seg_len
+                uy = (p_end[1] - p_start[1]) / seg_len
+                p_start = (p_start[0] + (ux * endpoint_inset), p_start[1] + (uy * endpoint_inset))
+                p_end = (p_end[0] - (ux * endpoint_inset), p_end[1] - (uy * endpoint_inset))
+                seg_len = max(0.0, seg_len - (endpoint_inset * 2.0))
+
+            if seg_len > max(1.0, HATCH_LINE_WIDTH_PX * 0.5):
+                segments.append((p_start, p_end, seg_len))
+        c += spacing
+
+    return segments
+
+
 def annulus_sector_points_screen(
     cx: float,
     cy: float,
@@ -574,6 +683,11 @@ def add_polyline_stroke_curve(
         curve_data.fill_mode = "NONE"
     except TypeError:
         curve_data.fill_mode = "FULL"
+    if hasattr(curve_data, "bevel_mode"):
+        try:
+            curve_data.bevel_mode = "ROUND"
+        except (TypeError, ValueError):
+            pass
     curve_data.bevel_depth = (max(1.0, stroke_width) * 0.5) * ((sx + sy) * 0.5)
     curve_data.bevel_resolution = 10
     curve_data.resolution_u = 24
@@ -1104,18 +1218,68 @@ def animate_curve_draw_sequential(
     start_frame: float,
     end_frame: float,
 ) -> None:
+    for obj, seg_start, seg_end in curve_draw_windows(curve_strokes, start_frame, end_frame):
+        animate_curve_draw([obj], seg_start, seg_end)
+
+
+def curve_draw_windows(
+    curve_strokes: Sequence[Tuple[bpy.types.Object, float]],
+    start_frame: float,
+    end_frame: float,
+) -> List[Tuple[bpy.types.Object, float, float]]:
+    windows: List[Tuple[bpy.types.Object, float, float]] = []
     span = max(0.001, end_frame - start_frame)
     total_length = sum(max(0.0, length) for _, length in curve_strokes)
     if total_length <= 1e-9:
-        animate_curve_draw([obj for obj, _ in curve_strokes], start_frame, end_frame)
-        return
+        for obj, _ in curve_strokes:
+            windows.append((obj, start_frame, max(start_frame + 0.001, end_frame)))
+        return windows
 
     cursor = start_frame
     for idx, (obj, length) in enumerate(curve_strokes):
         frac = max(0.0, length) / total_length
         segment_end = end_frame if idx == (len(curve_strokes) - 1) else (cursor + (span * frac))
-        animate_curve_draw([obj], cursor, max(cursor + 0.001, segment_end))
+        windows.append((obj, cursor, max(cursor + 0.001, segment_end)))
         cursor = segment_end
+    return windows
+
+
+def animate_curve_draw_randomized(
+    curve_strokes: Sequence[Tuple[bpy.types.Object, float]],
+    start_frame: float,
+    end_frame: float,
+    seed: int,
+) -> None:
+    if not curve_strokes:
+        return
+    shuffled = list(curve_strokes)
+    rng = random.Random(seed)
+    rng.shuffle(shuffled)
+    animate_curve_draw_sequential(shuffled, start_frame, end_frame)
+
+
+def animate_object_visible_at(obj: bpy.types.Object, visible_frame: float) -> None:
+    frame_show = max(1.0, float(visible_frame))
+    frame_hidden = max(1.0, frame_show - 0.001)
+
+    obj.hide_render = True
+    obj.keyframe_insert(data_path="hide_render", frame=1.0)
+    obj.keyframe_insert(data_path="hide_render", frame=frame_hidden)
+    obj.hide_render = False
+    obj.keyframe_insert(data_path="hide_render", frame=frame_show)
+
+    if obj.animation_data and obj.animation_data.action and hasattr(obj.animation_data.action, "fcurves"):
+        for fcurve in obj.animation_data.action.fcurves:
+            if fcurve.data_path != "hide_render":
+                continue
+            for key in fcurve.keyframe_points:
+                key.interpolation = "CONSTANT"
+
+
+def frame_from_progress(total_frames: float, progress: float) -> float:
+    clamped = max(0.0, min(1.0, progress))
+    span = max(1.0, total_frames) - 1.0
+    return 1.0 + (span * clamped)
 
 
 def plus_pop_completion_frame(
@@ -1158,9 +1322,12 @@ def render_sequence(
     transparent: bool,
 ) -> Path:
     sequence_dir.mkdir(parents=True, exist_ok=True)
+    for stale_frame in sequence_dir.glob(f"{prefix}*.png"):
+        stale_frame.unlink()
     scene.render.film_transparent = transparent
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
+    scene.render.use_overwrite = True
     scene.render.filepath = str(sequence_dir / prefix)
     bpy.ops.render.render(animation=True)
     return sequence_dir / f"{prefix}%04d.png"
@@ -1174,16 +1341,33 @@ def run_ffmpeg(cmd: Sequence[str]) -> None:
         raise RuntimeError(f"ffmpeg encode failed:\n{stderr}") from exc
 
 
+def detect_sequence_start_number(sequence_pattern: Path) -> int:
+    prefix = sequence_pattern.name.split("%", 1)[0]
+    candidates: List[int] = []
+    frame_re = re.compile(r"^(\d+)$")
+    for candidate in sequence_pattern.parent.glob(f"{prefix}*.png"):
+        suffix = candidate.stem[len(prefix):]
+        if not frame_re.match(suffix):
+            continue
+        candidates.append(int(suffix))
+    if not candidates:
+        raise RuntimeError(f"No image sequence frames found for pattern '{sequence_pattern}'.")
+    return min(candidates)
+
+
 def encode_mp4(sequence_pattern: Path, fps: int, output_path: Path) -> None:
     ffmpeg_bin = shutil.which("ffmpeg")
     if not ffmpeg_bin:
         raise RuntimeError("ffmpeg not found on PATH.")
 
+    start_number = detect_sequence_start_number(sequence_pattern)
     cmd = [
         ffmpeg_bin,
         "-y",
         "-framerate",
         str(fps),
+        "-start_number",
+        str(start_number),
         "-i",
         str(sequence_pattern),
         "-c:v",
@@ -1200,11 +1384,14 @@ def encode_webm_alpha(sequence_pattern: Path, fps: int, output_path: Path) -> No
     if not ffmpeg_bin:
         raise RuntimeError("ffmpeg not found on PATH.")
 
+    start_number = detect_sequence_start_number(sequence_pattern)
     cmd = [
         ffmpeg_bin,
         "-y",
         "-framerate",
         str(fps),
+        "-start_number",
+        str(start_number),
         "-i",
         str(sequence_pattern),
         "-c:v",
@@ -1232,7 +1419,6 @@ def build_layers(
     white_mat = make_flat_material("WhiteMat", hex_to_rgba("ffffff", 1.0))
     red_mat = make_flat_material("RedMat", hex_to_rgba(RED_PROFILE_PHOTO_HEX, 1.0))
     main_gradient_mat = make_horizontal_gradient_material("MainGradientMat")
-    hatch_mat = make_hatch_material("HatchMat")
     warm_glow_mat = make_image_glow_material(
         "WarmGlowMat",
         color_hex="c14d63",
@@ -1253,7 +1439,7 @@ def build_layers(
         MAIN_RECT["top"],
         MAIN_RECT["right"],
         MAIN_RECT["bottom"],
-        MAIN_RECT["radius"],
+        PROFILE_PHOTO_PANEL_CORNER_RADIUS,
         -0.20,
         frame_width,
         frame_height,
@@ -1269,7 +1455,7 @@ def build_layers(
         BLUE_BACK["top"] + Y_OFFSET_BLUE_PROFILE_PHOTO,
         BLUE_BACK["right"] + X_OFFSET_BLUE_SQUARE_PROFILE_PHOTO,
         BLUE_BACK["bottom"] + Y_OFFSET_BLUE_PROFILE_PHOTO,
-        BLUE_BACK["radius"],
+        PROFILE_PHOTO_PANEL_CORNER_RADIUS,
         -0.24,
         frame_width,
         frame_height,
@@ -1464,30 +1650,98 @@ def build_layers(
     animate_curve_draw_sequential(top_left_strokes, start_frame=curve_draw_start_frame, end_frame=plus_end_frame)
     animate_curve_draw_sequential(bottom_right_strokes, start_frame=curve_draw_start_frame, end_frame=plus_end_frame)
 
-    # Hatch block: right corners are 50% (capsule end), lower-left stays smaller.
-    hatch_top = 836
-    hatch_bottom = 1007
-    hatch_height = hatch_bottom - hatch_top
-    hatch_shape = hatch_block_points_screen(
-        0,
-        hatch_top,
-        450,
-        hatch_bottom,
-        right_radius=hatch_height * 0.5,
-        lower_left_radius=70,
-        segments=30,
+    # Hatch line-segment block with per-corner radii and rounded line caps.
+    hatch_height = HATCH_BLOCK_BOTTOM - HATCH_BLOCK_TOP
+    hatch_shape = rounded_rect_per_corner_points_screen(
+        HATCH_BLOCK_LEFT,
+        HATCH_BLOCK_TOP,
+        HATCH_BLOCK_RIGHT,
+        HATCH_BLOCK_BOTTOM,
+        radius_top_left=HATCH_BLOCK_RADIUS_TOP_LEFT_PX,
+        radius_top_right=hatch_height * HATCH_BLOCK_RADIUS_TOP_RIGHT_HEIGHT_RATIO,
+        radius_bottom_right=hatch_height * HATCH_BLOCK_RADIUS_BOTTOM_RIGHT_HEIGHT_RATIO,
+        radius_bottom_left=HATCH_BLOCK_RADIUS_BOTTOM_LEFT_PX,
+        segments=HATCH_BLOCK_CORNER_SEGMENTS,
     )
-    add_polygon_object(
-        "BottomLeftHatch",
+
+    hatch_segments = hatch_segments_in_polygon_screen(
         hatch_shape,
-        -0.05,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        hatch_mat,
-        overlay_coll,
+        spacing_px=HATCH_LINE_SPACING_PX,
+        line_angle_deg=HATCH_LINE_ANGLE_DEG,
+        endpoint_inset_px=HATCH_LINE_ENDPOINT_INSET_PX,
     )
+    hatch_rng = random.Random(HATCH_RANDOM_SEED)
+    cap_radius = max(0.5, HATCH_LINE_WIDTH_PX * 0.5)
+    hatch_strokes: List[Tuple[bpy.types.Object, float, bpy.types.Object, bpy.types.Object]] = []
+    for idx, (seg_start, seg_end, seg_len) in enumerate(hatch_segments):
+        if seg_len <= HATCH_LINE_WIDTH_PX:
+            continue
+        if hatch_rng.random() < 0.5:
+            draw_start = seg_start
+            draw_end = seg_end
+        else:
+            draw_start = seg_end
+            draw_end = seg_start
+
+        ux = (draw_end[0] - draw_start[0]) / max(1e-6, seg_len)
+        uy = (draw_end[1] - draw_start[1]) / max(1e-6, seg_len)
+        body_start = (draw_start[0] + (ux * cap_radius), draw_start[1] + (uy * cap_radius))
+        body_end = (draw_end[0] - (ux * cap_radius), draw_end[1] - (uy * cap_radius))
+        body_len = max(0.001, seg_len - (cap_radius * 2.0))
+
+        line_obj = add_polyline_stroke_curve(
+            name=f"BottomLeftHatchLine_{idx:03d}",
+            points_screen=[body_start, body_end],
+            stroke_width=HATCH_LINE_WIDTH_PX,
+            z=-0.05,
+            frame_width=frame_width,
+            frame_height=frame_height,
+            sx=sx,
+            sy=sy,
+            segments=2,
+            material=blue_foreground_mat,
+            collection=overlay_coll,
+        )
+
+        start_cap = add_polygon_object(
+            name=f"BottomLeftHatchStartCap_{idx:03d}",
+            points_screen=ellipse_points_screen(draw_start[0], draw_start[1], cap_radius, cap_radius, segments=26),
+            z=-0.05,
+            frame_width=frame_width,
+            frame_height=frame_height,
+            sx=sx,
+            sy=sy,
+            material=blue_foreground_mat,
+            collection=overlay_coll,
+        )
+        end_cap = add_polygon_object(
+            name=f"BottomLeftHatchEndCap_{idx:03d}",
+            points_screen=ellipse_points_screen(draw_end[0], draw_end[1], cap_radius, cap_radius, segments=26),
+            z=-0.05,
+            frame_width=frame_width,
+            frame_height=frame_height,
+            sx=sx,
+            sy=sy,
+            material=blue_foreground_mat,
+            collection=overlay_coll,
+        )
+        hatch_strokes.append((line_obj, body_len, start_cap, end_cap))
+
+    hatch_start_frame = frame_from_progress(animation_total_frames, HATCH_DRAW_START_PROGRESS)
+    hatch_end_frame = frame_from_progress(animation_total_frames, HATCH_DRAW_END_PROGRESS)
+    hatch_draw_order = list(hatch_strokes)
+    hatch_rng.shuffle(hatch_draw_order)
+    hatch_curve_windows = curve_draw_windows(
+        [(line_obj, line_len) for line_obj, line_len, _, _ in hatch_draw_order],
+        start_frame=hatch_start_frame,
+        end_frame=hatch_end_frame,
+    )
+    for line_obj, seg_start_frame, seg_end_frame in hatch_curve_windows:
+        animate_curve_draw([line_obj], seg_start_frame, seg_end_frame)
+
+    for (_, seg_start_frame, seg_end_frame), (_, _, start_cap, end_cap) in zip(hatch_curve_windows, hatch_draw_order):
+        animate_object_visible_at(start_cap, seg_start_frame)
+        animate_object_visible_at(end_cap, seg_end_frame)
 
     # Subject lighting overlays on top layer.
     add_ellipse_glow(
