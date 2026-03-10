@@ -55,7 +55,7 @@ RED_GRADIENT_END_STOP_PROFILE_PHOTO = 0.9
 # Master animation duration. All internal checkpoints scale from this value.
 # Actual frame count is computed as: round(fps * duration_seconds).
 PROFILE_PHOTO_ANIMATION_FPS = 24
-PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 4.0
+PROFILE_PHOTO_ANIMATION_DURATION_SECONDS = 0.5
 
 # Hatch tuning (in screen-pixel units for the ortho camera setup).
 HATCH_LINE_WIDTH_PX = 2.0
@@ -80,6 +80,27 @@ HATCH_DRAW_END_PROGRESS = 1.0
 HATCH_DRAW_ORIGIN_SEED = 17
 # Backward-compatible alias (used by older helpers).
 HATCH_RANDOM_SEED = HATCH_DRAW_ORIGIN_SEED
+
+# Plus draw animation controls.
+# Portion of the full timeline each plus can consume (both strokes combined).
+# 1.0 means all pluses must start together at frame 1 and finish at the final frame.
+LIFECYCLE_OF_PLUS_ANIMATION_AS_PORTION_OF_TOTAL_ANIMATION = 0.45
+# Dedicated seed for all plus randomness: start time, stroke order, and stroke origins.
+PLUS_ANIMATION_RANDOM_SEED = 29
+
+# Plus layout controls (screen-space px at 1000x1007 reference geometry).
+# "Length" here is the square footprint of each plus icon (width == height).
+WHITE_PLUS_SIZE_PX = 30.0
+BLUE_PLUS_SIZE_PX = 29.0
+WHITE_PLUS_THICKNESS_PX = 6.0
+BLUE_PLUS_THICKNESS_PX = 7.0
+WHITE_PLUS_COL_GAP_PX = 39.0
+WHITE_PLUS_ROW_GAP_PX = 38.5
+BLUE_PLUS_COL_GAP_PX = 38.5
+BLUE_PLUS_ROW_GAP_PX = 38.5
+# Top offsets are measured from the red panel top edge (MAIN_RECT["top"]).
+WHITE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX = 206.0
+BLUE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX = 321.5
 
 
 def parse_blender_args() -> argparse.Namespace:
@@ -1056,46 +1077,43 @@ def add_plus(
     sy: float,
     material: bpy.types.Material,
     collection: bpy.types.Collection,
-) -> List[bpy.types.Object]:
-    half = size * 0.5
-    half_t = thickness * 0.5
-    r = thickness * 0.5
+) -> List[Tuple[bpy.types.Object, float, float]]:
+    # Use true stroked curves so draw-on animation keeps rounded caps at every step.
+    centerline_length = max(0.001, size - thickness)
+    half_line = centerline_length * 0.5
 
-    vert = add_rounded_rect(
+    vert = add_polyline_stroke_curve(
         f"{name_prefix}Vert",
-        cx - half_t,
-        cy - half,
-        cx + half_t,
-        cy + half,
-        r,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        material,
-        collection,
-        origin_screen=(cx, cy),
+        points_screen=[(cx, cy - half_line), (cx, cy + half_line)],
+        stroke_width=thickness,
+        z=z,
+        frame_width=frame_width,
+        frame_height=frame_height,
+        sx=sx,
+        sy=sy,
+        segments=2,
+        material=material,
+        collection=collection,
     )
 
-    horz = add_rounded_rect(
+    horz = add_polyline_stroke_curve(
         f"{name_prefix}Horz",
-        cx - half,
-        cy - half_t,
-        cx + half,
-        cy + half_t,
-        r,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        material,
-        collection,
-        origin_screen=(cx, cy),
+        points_screen=[(cx - half_line, cy), (cx + half_line, cy)],
+        stroke_width=thickness,
+        z=z,
+        frame_width=frame_width,
+        frame_height=frame_height,
+        sx=sx,
+        sy=sy,
+        segments=2,
+        material=material,
+        collection=collection,
     )
 
-    return [vert, horz]
+    return [
+        (vert, centerline_length, thickness),
+        (horz, centerline_length, thickness),
+    ]
 
 
 def add_plus_grid(
@@ -1115,8 +1133,8 @@ def add_plus_grid(
     sy: float,
     material: bpy.types.Material,
     collection: bpy.types.Collection,
-) -> List[List[bpy.types.Object]]:
-    plus_groups: List[List[bpy.types.Object]] = []
+) -> List[List[Tuple[bpy.types.Object, float, float]]]:
+    plus_groups: List[List[Tuple[bpy.types.Object, float, float]]] = []
     for r in range(rows):
         for c in range(cols):
             cx = left_center_x + (c * col_gap)
@@ -1138,48 +1156,66 @@ def add_plus_grid(
     return plus_groups
 
 
-def set_bezier_scale_curves(obj: bpy.types.Object) -> None:
-    if not obj.animation_data or not obj.animation_data.action:
-        return
-    action = obj.animation_data.action
-    if not hasattr(action, "fcurves"):
-        return
-    for fcurve in action.fcurves:
-        if fcurve.data_path != "scale":
+def animate_plus_draw_lifecycle(
+    plus_groups: Sequence[Sequence[Tuple[bpy.types.Object, float, float]]],
+    total_frames: float,
+    lifecycle_portion: float,
+    seed: int,
+) -> float:
+    if not plus_groups:
+        return 1.0
+
+    start_frame = 1.0
+    end_frame = max(start_frame + 0.001, float(total_frames))
+    total_span = end_frame - start_frame
+    clamped_lifecycle = max(1e-4, min(1.0, lifecycle_portion))
+    per_plus_span = max(0.001, total_span * clamped_lifecycle)
+
+    max_plus_start = max(start_frame, end_frame - per_plus_span)
+    start_jitter_span = max(0.0, max_plus_start - start_frame)
+
+    rng = random.Random(seed)
+    latest_end = start_frame
+
+    for group in plus_groups:
+        if len(group) < 2:
             continue
-        for key in fcurve.keyframe_points:
-            key.interpolation = "BEZIER"
-            key.handle_left_type = "AUTO_CLAMPED"
-            key.handle_right_type = "AUTO_CLAMPED"
 
+        plus_start = start_frame if start_jitter_span <= 1e-6 else (start_frame + (rng.random() * start_jitter_span))
+        first_stroke_idx = 0 if rng.random() < 0.5 else 1
+        second_stroke_idx = 1 - first_stroke_idx
 
-def animate_plus_pop(
-    plus_groups: Sequence[Sequence[bpy.types.Object]],
-    cols: int,
-    start_frame: float,
-    row_delay: float,
-    col_delay: float,
-    pop_duration: float,
-    settle_duration: float,
-    overshoot: float = 1.16,
-) -> None:
-    hidden = 0.001
-    for idx, group in enumerate(plus_groups):
-        row = idx // cols
-        col = idx % cols
-        f0 = start_frame + (row * row_delay) + (col * col_delay)
-        f1 = f0 + pop_duration
-        f2 = f1 + settle_duration
-        for obj in group:
-            obj.scale = (hidden, hidden, 1.0)
-            obj.keyframe_insert(data_path="scale", frame=1.0)
-            obj.scale = (hidden, hidden, 1.0)
-            obj.keyframe_insert(data_path="scale", frame=f0)
-            obj.scale = (overshoot, overshoot, 1.0)
-            obj.keyframe_insert(data_path="scale", frame=f1)
-            obj.scale = (1.0, 1.0, 1.0)
-            obj.keyframe_insert(data_path="scale", frame=f2)
-            set_bezier_scale_curves(obj)
+        first_obj, first_length, first_width = group[first_stroke_idx]
+        second_obj, second_length, second_width = group[second_stroke_idx]
+
+        first_start = plus_start
+        first_end = plus_start + (per_plus_span * 0.5)
+        second_start = first_end
+        second_end = plus_start + per_plus_span
+
+        animate_object_visible_at(first_obj, first_start)
+        animate_object_visible_at(second_obj, second_start)
+
+        animate_curve_draw_center_out_with_origin(
+            obj=first_obj,
+            line_length=first_length,
+            start_frame=first_start,
+            end_frame=first_end,
+            origin_factor=rng.random(),
+            initial_segment_px=max(0.001, first_width * 0.02),
+        )
+        animate_curve_draw_center_out_with_origin(
+            obj=second_obj,
+            line_length=second_length,
+            start_frame=second_start,
+            end_frame=second_end,
+            origin_factor=rng.random(),
+            initial_segment_px=max(0.001, second_width * 0.02),
+        )
+
+        latest_end = max(latest_end, second_end)
+
+    return min(end_frame, latest_end)
 
 
 def set_curve_draw_linear(obj: bpy.types.Object) -> None:
@@ -1262,6 +1298,59 @@ def animate_curve_draw_randomized(
     animate_curve_draw_sequential(shuffled, start_frame, end_frame)
 
 
+def animate_curve_draw_center_out_with_origin(
+    obj: bpy.types.Object,
+    line_length: float,
+    start_frame: float,
+    end_frame: float,
+    origin_factor: float,
+    initial_segment_px: float,
+) -> None:
+    curve_data = obj.data
+    if not isinstance(curve_data, bpy.types.Curve):
+        return
+
+    draw_end = max(start_frame + 0.001, end_frame)
+    center = max(0.0, min(1.0, origin_factor))
+    dot_half_span = 0.0
+    if line_length > 1e-6:
+        # Tiny visible capsule at start approximates a circular dot.
+        dot_half_span = min(0.49, max(1e-6, (initial_segment_px * 0.5) / line_length))
+
+    start_factor = max(0.0, center - dot_half_span)
+    end_factor = min(1.0, center + dot_half_span)
+    left_span = center
+    right_span = 1.0 - center
+    max_span = max(left_span, right_span)
+    min_span = min(left_span, right_span)
+
+    # Animate both bevel factors so growth always exposes two rounded tips.
+    curve_data.bevel_factor_mapping_start = "SPLINE"
+    curve_data.bevel_factor_mapping_end = "SPLINE"
+    curve_data.bevel_factor_start = start_factor
+    curve_data.bevel_factor_end = end_factor
+    curve_data.keyframe_insert(data_path="bevel_factor_start", frame=start_frame)
+    curve_data.keyframe_insert(data_path="bevel_factor_end", frame=start_frame)
+
+    if max_span > 1e-6 and min_span > 1e-6 and (min_span / max_span) < 0.999:
+        hit_progress = min_span / max_span
+        hit_frame = start_frame + ((draw_end - start_frame) * hit_progress)
+        if left_span <= right_span:
+            curve_data.bevel_factor_start = 0.0
+            curve_data.bevel_factor_end = min(1.0, center + min_span)
+        else:
+            curve_data.bevel_factor_start = max(0.0, center - min_span)
+            curve_data.bevel_factor_end = 1.0
+        curve_data.keyframe_insert(data_path="bevel_factor_start", frame=hit_frame)
+        curve_data.keyframe_insert(data_path="bevel_factor_end", frame=hit_frame)
+
+    curve_data.bevel_factor_start = 0.0
+    curve_data.bevel_factor_end = 1.0
+    curve_data.keyframe_insert(data_path="bevel_factor_start", frame=draw_end)
+    curve_data.keyframe_insert(data_path="bevel_factor_end", frame=draw_end)
+    set_curve_draw_linear(obj)
+
+
 def animate_curve_draw_center_out_random_origin(
     curve_strokes: Sequence[Tuple[bpy.types.Object, float]],
     start_frame: float,
@@ -1271,52 +1360,16 @@ def animate_curve_draw_center_out_random_origin(
     if not curve_strokes:
         return
 
-    draw_end = max(start_frame + 0.001, end_frame)
     rng = random.Random(seed)
-
     for obj, line_length in curve_strokes:
-        curve_data = obj.data
-        if not isinstance(curve_data, bpy.types.Curve):
-            continue
-
-        center = max(0.0, min(1.0, rng.random()))
-        dot_half_span = 0.0
-        if line_length > 1e-6:
-            # Start with a tiny visible capsule so frame 1 looks like a dot.
-            dot_half_span = min(0.49, max(1e-4, (HATCH_LINE_WIDTH_PX * 0.15) / line_length))
-
-        start_factor = max(0.0, center - dot_half_span)
-        end_factor = min(1.0, center + dot_half_span)
-        left_span = center
-        right_span = 1.0 - center
-        max_span = max(left_span, right_span)
-        min_span = min(left_span, right_span)
-
-        # Animate both bevel factors so growth always exposes two rounded tips.
-        curve_data.bevel_factor_mapping_start = "SPLINE"
-        curve_data.bevel_factor_mapping_end = "SPLINE"
-        curve_data.bevel_factor_start = start_factor
-        curve_data.bevel_factor_end = end_factor
-        curve_data.keyframe_insert(data_path="bevel_factor_start", frame=start_frame)
-        curve_data.keyframe_insert(data_path="bevel_factor_end", frame=start_frame)
-
-        if max_span > 1e-6 and min_span > 1e-6 and (min_span / max_span) < 0.999:
-            hit_progress = min_span / max_span
-            hit_frame = start_frame + ((draw_end - start_frame) * hit_progress)
-            if left_span <= right_span:
-                curve_data.bevel_factor_start = 0.0
-                curve_data.bevel_factor_end = min(1.0, center + min_span)
-            else:
-                curve_data.bevel_factor_start = max(0.0, center - min_span)
-                curve_data.bevel_factor_end = 1.0
-            curve_data.keyframe_insert(data_path="bevel_factor_start", frame=hit_frame)
-            curve_data.keyframe_insert(data_path="bevel_factor_end", frame=hit_frame)
-
-        curve_data.bevel_factor_start = 0.0
-        curve_data.bevel_factor_end = 1.0
-        curve_data.keyframe_insert(data_path="bevel_factor_start", frame=draw_end)
-        curve_data.keyframe_insert(data_path="bevel_factor_end", frame=draw_end)
-        set_curve_draw_linear(obj)
+        animate_curve_draw_center_out_with_origin(
+            obj=obj,
+            line_length=line_length,
+            start_frame=start_frame,
+            end_frame=end_frame,
+            origin_factor=rng.random(),
+            initial_segment_px=max(0.001, HATCH_LINE_WIDTH_PX * 0.02),
+        )
 
 
 def animate_object_visible_at(obj: bpy.types.Object, visible_frame: float) -> None:
@@ -1341,24 +1394,6 @@ def frame_from_progress(total_frames: float, progress: float) -> float:
     clamped = max(0.0, min(1.0, progress))
     span = max(1.0, total_frames) - 1.0
     return 1.0 + (span * clamped)
-
-
-def plus_pop_completion_frame(
-    cols: int,
-    rows: int,
-    start_frame: float,
-    row_delay: float,
-    col_delay: float,
-    pop_duration: float,
-    settle_duration: float,
-) -> float:
-    return (
-        start_frame
-        + ((rows - 1) * row_delay)
-        + ((cols - 1) * col_delay)
-        + pop_duration
-        + settle_duration
-    )
 
 
 def set_layer_visibility(background_coll: bpy.types.Collection, overlay_coll: bpy.types.Collection, *,
@@ -1566,13 +1601,13 @@ def build_layers(
     white_pluses = add_plus_grid(
         "WhitePlus",
         left_center_x=839.5,
-        top_center_y=336.0,
+        top_center_y=MAIN_RECT["top"] + WHITE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX,
         cols=2,
         rows=7,
-        col_gap=39.0,
-        row_gap=38.5,
-        size=26,
-        thickness=6,
+        col_gap=WHITE_PLUS_COL_GAP_PX,
+        row_gap=WHITE_PLUS_ROW_GAP_PX,
+        size=WHITE_PLUS_SIZE_PX,
+        thickness=WHITE_PLUS_THICKNESS_PX,
         z=-0.05,
         frame_width=frame_width,
         frame_height=frame_height,
@@ -1585,13 +1620,13 @@ def build_layers(
     blue_pluses = add_plus_grid(
         "BluePlus",
         left_center_x=947.0,
-        top_center_y=451.5,
+        top_center_y=MAIN_RECT["top"] + BLUE_PLUS_TOP_CENTER_OFFSET_FROM_RED_PANEL_PX,
         cols=2,
         rows=7,
-        col_gap=38.5,
-        row_gap=38.5,
-        size=29,
-        thickness=7,
+        col_gap=BLUE_PLUS_COL_GAP_PX,
+        row_gap=BLUE_PLUS_ROW_GAP_PX,
+        size=BLUE_PLUS_SIZE_PX,
+        thickness=BLUE_PLUS_THICKNESS_PX,
         z=-0.05,
         frame_width=frame_width,
         frame_height=frame_height,
@@ -1601,115 +1636,18 @@ def build_layers(
         collection=overlay_coll,
     )
 
-    base_white_plus_pop = {
-        "cols": 2,
-        "rows": 7,
-        "start_frame": 2.0,
-        "row_delay": 0.84,
-        "col_delay": 0.22,
-        "pop_duration": 4.6,
-        "settle_duration": 2.5,
-        "overshoot": 1.16,
-    }
-    base_blue_plus_pop = {
-        "cols": 2,
-        "rows": 7,
-        "start_frame": 3.1,
-        "row_delay": 0.84,
-        "col_delay": 0.22,
-        "pop_duration": 4.6,
-        "settle_duration": 2.5,
-        "overshoot": 1.14,
-    }
-
-    base_plus_end_frame = max(
-        plus_pop_completion_frame(
-            cols=base_white_plus_pop["cols"],
-            rows=base_white_plus_pop["rows"],
-            start_frame=base_white_plus_pop["start_frame"],
-            row_delay=base_white_plus_pop["row_delay"],
-            col_delay=base_white_plus_pop["col_delay"],
-            pop_duration=base_white_plus_pop["pop_duration"],
-            settle_duration=base_white_plus_pop["settle_duration"],
-        ),
-        plus_pop_completion_frame(
-            cols=base_blue_plus_pop["cols"],
-            rows=base_blue_plus_pop["rows"],
-            start_frame=base_blue_plus_pop["start_frame"],
-            row_delay=base_blue_plus_pop["row_delay"],
-            col_delay=base_blue_plus_pop["col_delay"],
-            pop_duration=base_blue_plus_pop["pop_duration"],
-            settle_duration=base_blue_plus_pop["settle_duration"],
-        ),
-    )
-    time_scale = animation_total_frames / max(1e-6, base_plus_end_frame)
-
-    white_plus_pop = {
-        "cols": base_white_plus_pop["cols"],
-        "rows": base_white_plus_pop["rows"],
-        "start_frame": base_white_plus_pop["start_frame"] * time_scale,
-        "row_delay": base_white_plus_pop["row_delay"] * time_scale,
-        "col_delay": base_white_plus_pop["col_delay"] * time_scale,
-        "pop_duration": base_white_plus_pop["pop_duration"] * time_scale,
-        "settle_duration": base_white_plus_pop["settle_duration"] * time_scale,
-        "overshoot": base_white_plus_pop["overshoot"],
-    }
-    blue_plus_pop = {
-        "cols": base_blue_plus_pop["cols"],
-        "rows": base_blue_plus_pop["rows"],
-        "start_frame": base_blue_plus_pop["start_frame"] * time_scale,
-        "row_delay": base_blue_plus_pop["row_delay"] * time_scale,
-        "col_delay": base_blue_plus_pop["col_delay"] * time_scale,
-        "pop_duration": base_blue_plus_pop["pop_duration"] * time_scale,
-        "settle_duration": base_blue_plus_pop["settle_duration"] * time_scale,
-        "overshoot": base_blue_plus_pop["overshoot"],
-    }
-
-    animate_plus_pop(
-        white_pluses,
-        cols=white_plus_pop["cols"],
-        start_frame=white_plus_pop["start_frame"],
-        row_delay=white_plus_pop["row_delay"],
-        col_delay=white_plus_pop["col_delay"],
-        pop_duration=white_plus_pop["pop_duration"],
-        settle_duration=white_plus_pop["settle_duration"],
-        overshoot=white_plus_pop["overshoot"],
-    )
-    animate_plus_pop(
-        blue_pluses,
-        cols=blue_plus_pop["cols"],
-        start_frame=blue_plus_pop["start_frame"],
-        row_delay=blue_plus_pop["row_delay"],
-        col_delay=blue_plus_pop["col_delay"],
-        pop_duration=blue_plus_pop["pop_duration"],
-        settle_duration=blue_plus_pop["settle_duration"],
-        overshoot=blue_plus_pop["overshoot"],
+    all_pluses = white_pluses + blue_pluses
+    animate_plus_draw_lifecycle(
+        all_pluses,
+        total_frames=animation_total_frames,
+        lifecycle_portion=LIFECYCLE_OF_PLUS_ANIMATION_AS_PORTION_OF_TOTAL_ANIMATION,
+        seed=PLUS_ANIMATION_RANDOM_SEED,
     )
 
-    plus_end_frame = max(
-        plus_pop_completion_frame(
-            cols=white_plus_pop["cols"],
-            rows=white_plus_pop["rows"],
-            start_frame=white_plus_pop["start_frame"],
-            row_delay=white_plus_pop["row_delay"],
-            col_delay=white_plus_pop["col_delay"],
-            pop_duration=white_plus_pop["pop_duration"],
-            settle_duration=white_plus_pop["settle_duration"],
-        ),
-        plus_pop_completion_frame(
-            cols=blue_plus_pop["cols"],
-            rows=blue_plus_pop["rows"],
-            start_frame=blue_plus_pop["start_frame"],
-            row_delay=blue_plus_pop["row_delay"],
-            col_delay=blue_plus_pop["col_delay"],
-            pop_duration=blue_plus_pop["pop_duration"],
-            settle_duration=blue_plus_pop["settle_duration"],
-        ),
-    )
-
-    curve_draw_start_frame = 1.0 * time_scale
-    animate_curve_draw_sequential(top_left_strokes, start_frame=curve_draw_start_frame, end_frame=plus_end_frame)
-    animate_curve_draw_sequential(bottom_right_strokes, start_frame=curve_draw_start_frame, end_frame=plus_end_frame)
+    curve_draw_start_frame = 1.0
+    curve_draw_end_frame = max(1.001, animation_total_frames)
+    animate_curve_draw_sequential(top_left_strokes, start_frame=curve_draw_start_frame, end_frame=curve_draw_end_frame)
+    animate_curve_draw_sequential(bottom_right_strokes, start_frame=curve_draw_start_frame, end_frame=curve_draw_end_frame)
 
     # Hatch line-segment block with per-corner radii and rounded line caps.
     hatch_height = HATCH_BLOCK_BOTTOM - HATCH_BLOCK_TOP
@@ -1789,7 +1727,7 @@ def build_layers(
         material=dark_glow_mat,
         collection=overlay_coll,
     )
-    return plus_end_frame
+    return animation_total_frames
 
 
 
