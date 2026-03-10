@@ -1,5 +1,6 @@
 export const ABOVE_FOLD_TEXT_SHIMMERS = false;
 export const MENU_BAR_STAYS_AT_TOP = true;
+export const USE_NEW_PICTURE = true;
 export const DEBUG_UI =
   String(
     (import.meta as ImportMeta & { env: { VITE_DEBUG_UI?: string } }).env.VITE_DEBUG_UI

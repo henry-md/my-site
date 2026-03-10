@@ -892,11 +892,12 @@ button.toggle-see-more-btn::before {
 .header-image {
   width: min(100%, 470px);
   justify-self: center;
-  border-radius: 30px;
-  background: var(--surface-hero);
-  border: 1px solid transparent;
-  box-shadow: var(--shadow-card);
-  padding: 0.8rem;
+  border-radius: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  overflow: visible;
 }
 
 body.ui-dark .header-image {
@@ -913,6 +914,74 @@ body.ui-dark .header-image {
   height: auto;
   object-fit: contain;
   object-position: center;
+}
+
+.avatar-blender-composite {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 1007;
+  overflow: visible;
+}
+
+.avatar-blender-backdrop,
+.avatar-blender-overlay,
+.avatar-blender-person {
+  position: absolute;
+}
+
+.avatar-blender-backdrop,
+.avatar-blender-overlay {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  max-width: none;
+  border-radius: 0;
+}
+
+.header-image .avatar-blender-composite > .avatar-blender-backdrop,
+.header-image .avatar-blender-composite > .avatar-blender-overlay,
+.header-image .avatar-blender-composite > .avatar-blender-person,
+.header-text .avatar-blender-composite > .avatar-blender-backdrop,
+.header-text .avatar-blender-composite > .avatar-blender-overlay,
+.header-text .avatar-blender-composite > .avatar-blender-person {
+  border-radius: 0;
+}
+
+.avatar-blender-backdrop {
+  z-index: 1;
+}
+
+.avatar-blender-person {
+  z-index: 2;
+  left: 2.4%;
+  bottom: 4.27%;
+  width: 89%;
+  max-width: none;
+  transform: none;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
+}
+
+.avatar-blender-overlay {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.avatar-blender-overlay-video {
+  background: transparent;
+}
+
+.avatar-blender-backdrop-video {
+  background: transparent;
+}
+
+.header-image .avatar-blender-person {
+  width: 89%;
+  border-radius: 0;
 }
 
 .header-text .mobile-avatar {
@@ -1133,14 +1202,12 @@ button.toggle-see-more-btn:hover {
 
 .featured-video {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: contain;
-  object-position: center;
+  height: auto;
+  align-self: start;
   border-radius: 10px;
-  overflow: hidden;
-  border: none;
+  border: 1px solid var(--featured-media-outline, var(--line-soft));
   box-shadow: none;
-  background: #05070d;
+  background: transparent;
 }
 
 .featured-text {
@@ -1326,10 +1393,10 @@ button.toggle-see-more-btn:hover {
 }
 
 .fade-in-section {
-  opacity: 0;
+  opacity: 1;
   transform: translateY(20vh);
   visibility: hidden;
-  transition: opacity 1000ms ease-out, transform 600ms ease-out, visibility 1000ms ease-out;
+  transition: transform 600ms ease-out;
 }
 
 .fade-in-section.is-visible {
@@ -1369,6 +1436,17 @@ body.ui-light .header-image {
   );
 }
 
+/* Hero blender card should render without any outer frame/glass outline. */
+body.ui-light .header-image,
+body.ui-dark .header-image {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
 body.ui-light .header-text .mobile-avatar {
   border-color: var(--light-glass-border-soft);
 }
@@ -1400,6 +1478,10 @@ body.ui-light .featured-project > *,
 body.ui-light .header-image > * {
   position: relative;
   z-index: 1;
+}
+
+body.ui-light .header-image::before {
+  content: none;
 }
 
 body.ui-light .theme-modal-overlay {
@@ -1435,8 +1517,8 @@ body.ui-light .theme-option.active {
 }
 
 body.ui-light .featured-video {
-  border: none;
-  background: #05070d;
+  border-color: var(--featured-media-outline, rgba(132, 161, 205, 0.4));
+  background: transparent;
   box-shadow: none;
 }
 
@@ -1583,8 +1665,8 @@ body.ui-dark .theme-option.active {
 }
 
 body.ui-dark .featured-video {
-  border: none;
-  background: #05070d;
+  border-color: var(--featured-media-outline, rgba(142, 170, 220, 0.34));
+  background: transparent;
   box-shadow: none;
 }
 
@@ -1751,6 +1833,18 @@ html.liquid-glass-opacity-zero body.ui-dark .header-image::before {
     box-shadow: var(--shadow-soft);
     align-self: center;
     object-fit: contain;
+  }
+
+  .header-text .mobile-avatar.avatar-blender-composite-mobile {
+    width: min(326px, 80vw);
+    margin-top: 1.02rem;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .header-text .mobile-avatar.avatar-blender-composite-mobile .avatar-blender-person {
+    width: 89%;
   }
 
   .subhead-small,

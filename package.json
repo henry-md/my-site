@@ -9,6 +9,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "build": "vite build",
+    "render:headshot-bg": "${BLENDER_BIN:-/Applications/Blender.app/Contents/MacOS/Blender} -b -P scripts/blender/headshot_background_endframe.py -- --output-dir public/generated/headshot-bg --frame-width 1000 --frame-height 1007",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
