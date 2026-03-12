@@ -5,7 +5,6 @@ Render headshot decorative layers with Blender (bpy).
 Outputs (default names):
 - headshot-bg-backdrop.png: base rectangle + blue accents (transparent outside)
 - headshot-bg-overlay.png: plusses/lines/arcs/light gradient overlay (transparent)
-- headshot-bg-backdrop.webm: animated backdrop layer (alpha)
 - headshot-bg-overlay.webm: hold video for overlay layer (alpha)
 
 Run:
@@ -132,9 +131,7 @@ def parse_blender_args() -> argparse.Namespace:
     parser.add_argument("--backdrop-still-name", type=str, default="headshot-bg-backdrop.png")
     parser.add_argument("--overlay-still-name", type=str, default="headshot-bg-overlay.png")
 
-    parser.add_argument("--backdrop-video-webm-name", type=str, default="headshot-bg-backdrop.webm")
     parser.add_argument("--overlay-video-webm-name", type=str, default="headshot-bg-overlay.webm")
-    parser.add_argument("--overlay-video-mp4-name", type=str, default="headshot-bg-overlay.mp4")
 
     parser.add_argument(
         "--keep-frame-sequence",
@@ -1490,30 +1487,6 @@ def detect_sequence_start_number(sequence_pattern: Path) -> int:
     return min(candidates)
 
 
-def encode_mp4(sequence_pattern: Path, fps: int, output_path: Path) -> None:
-    ffmpeg_bin = shutil.which("ffmpeg")
-    if not ffmpeg_bin:
-        raise RuntimeError("ffmpeg not found on PATH.")
-
-    start_number = detect_sequence_start_number(sequence_pattern)
-    cmd = [
-        ffmpeg_bin,
-        "-y",
-        "-framerate",
-        str(fps),
-        "-start_number",
-        str(start_number),
-        "-i",
-        str(sequence_pattern),
-        "-c:v",
-        "libx264",
-        "-pix_fmt",
-        "yuv444p",
-        str(output_path),
-    ]
-    run_ffmpeg(cmd)
-
-
 def encode_webm_alpha(sequence_pattern: Path, fps: int, output_path: Path) -> None:
     ffmpeg_bin = shutil.which("ffmpeg")
     if not ffmpeg_bin:
@@ -1805,29 +1778,19 @@ def main() -> None:
     render_still(scene, overlay_still_path, transparent=True)
 
     if not args.skip_video:
-        # Backdrop video (alpha).
-        set_layer_visibility(bg_coll, fg_coll, show_background=True, show_overlay=False)
-        backdrop_seq_dir = out_dir / "headshot-bg-backdrop_frames"
-        backdrop_pattern = render_sequence(scene, backdrop_seq_dir, "frame_", transparent=True)
-        encode_webm_alpha(backdrop_pattern, args.fps, out_dir / args.backdrop_video_webm_name)
-
-        # Overlay video (alpha + mp4 fallback).
+        # Overlay video (alpha).
         set_layer_visibility(bg_coll, fg_coll, show_background=False, show_overlay=True)
         overlay_seq_dir = out_dir / "headshot-bg-overlay_frames"
         overlay_pattern = render_sequence(scene, overlay_seq_dir, "frame_", transparent=True)
         encode_webm_alpha(overlay_pattern, args.fps, out_dir / args.overlay_video_webm_name)
-        encode_mp4(overlay_pattern, args.fps, out_dir / args.overlay_video_mp4_name)
 
         if not args.keep_frame_sequence:
-            shutil.rmtree(backdrop_seq_dir, ignore_errors=True)
             shutil.rmtree(overlay_seq_dir, ignore_errors=True)
 
     print(f"Rendered backdrop still: {backdrop_still_path.resolve()}")
     print(f"Rendered overlay still: {overlay_still_path.resolve()}")
     if not args.skip_video:
-        print(f"Rendered backdrop webm: {(out_dir / args.backdrop_video_webm_name).resolve()}")
         print(f"Rendered overlay webm: {(out_dir / args.overlay_video_webm_name).resolve()}")
-        print(f"Rendered overlay mp4: {(out_dir / args.overlay_video_mp4_name).resolve()}")
 
 
 if __name__ == "__main__":
