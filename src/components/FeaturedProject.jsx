@@ -81,6 +81,8 @@ class FeaturedProject extends React.Component {
       callToActionLink,
       secondCallToAction,
       secondCallToActionLink,
+      thirdCallToAction,
+      thirdCallToActionLink,
     } = this.props;
     const { mediaOutlineColor } = this.state;
     const mediaStyle = mediaOutlineColor ? { '--featured-media-outline': mediaOutlineColor } : undefined;
@@ -104,6 +106,9 @@ class FeaturedProject extends React.Component {
             {secondCallToAction && (
               <a href={secondCallToActionLink} className="light-button featured-call" target="_blank" rel="noreferrer">{secondCallToAction}</a>
             )}
+            {thirdCallToAction && (
+              <a href={thirdCallToActionLink} className="light-button featured-call" target="_blank" rel="noreferrer">{thirdCallToAction}</a>
+            )}
           </div>
         </div>
       </div>
@@ -121,6 +126,8 @@ FeaturedProject.propTypes = {
   callToAction: PropTypes.string.isRequired,
   secondCallToAction: PropTypes.string,
   secondCallToActionLink: PropTypes.string,
+  thirdCallToAction: PropTypes.string,
+  thirdCallToActionLink: PropTypes.string,
 };
 
 export default FeaturedProject;

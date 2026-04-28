@@ -386,6 +386,8 @@ function App() {
               callToActionLink="https://intention-setting-production.up.railway.app/henrymdeutsch"
               secondCallToAction="View GitHub"
               secondCallToActionLink="https://github.com/henry-md/intention-setting"
+              thirdCallToAction="Chrome Web Store"
+              thirdCallToActionLink="https://chromewebstore.google.com/detail/intention-setting/fnemliooiheogciefhmbiknheoeflaal?authuser=0&hl=en"
             />
           </FadeInSection>
 
