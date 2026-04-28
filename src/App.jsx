@@ -46,7 +46,6 @@ const LIQUID_GLASS_ALPHA_STOPS = [
   0.78,
 ];
 const BLENDER_HEADSHOT_BACKDROP = '/generated/headshot-bg/headshot-bg-backdrop.png';
-const BLENDER_HEADSHOT_BACKDROP_WEBM = '/generated/headshot-bg/headshot-bg-backdrop.webm';
 const BLENDER_HEADSHOT_OVERLAY = '/generated/headshot-bg/headshot-bg-overlay.png';
 const BLENDER_HEADSHOT_OVERLAY_WEBM = '/generated/headshot-bg/headshot-bg-overlay.webm';
 
@@ -116,7 +115,6 @@ FadeInSection.propTypes = {
 };
 
 function HeroHeadshot({ mobile }) {
-  const [supportsAnimatedBackdrop, setSupportsAnimatedBackdrop] = React.useState(false);
   const [supportsAnimatedOverlay, setSupportsAnimatedOverlay] = React.useState(false);
 
   React.useEffect(() => {
@@ -124,7 +122,6 @@ function HeroHeadshot({ mobile }) {
       return;
     }
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setSupportsAnimatedBackdrop(false);
       setSupportsAnimatedOverlay(false);
       return;
     }
@@ -132,7 +129,6 @@ function HeroHeadshot({ mobile }) {
     const probe = document.createElement('video');
     const vp9Support = probe.canPlayType('video/webm; codecs="vp9"');
     const canPlayWebmVp9 = vp9Support && vp9Support !== 'no';
-    setSupportsAnimatedBackdrop(Boolean(canPlayWebmVp9));
     setSupportsAnimatedOverlay(Boolean(canPlayWebmVp9));
   }, []);
 
@@ -149,21 +145,7 @@ function HeroHeadshot({ mobile }) {
 
   return (
     <div className={`avatar-blender-composite ${mobile ? 'mobile-avatar avatar-blender-composite-mobile' : ''}`}>
-      {supportsAnimatedBackdrop ? (
-        <video
-          className="avatar-blender-backdrop avatar-blender-backdrop-video"
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-        >
-          <source src={BLENDER_HEADSHOT_BACKDROP_WEBM} type='video/webm; codecs="vp9"' />
-          <source src={BLENDER_HEADSHOT_BACKDROP_WEBM} type="video/webm" />
-        </video>
-      ) : (
-        <img src={BLENDER_HEADSHOT_BACKDROP} alt="" className="avatar-blender-backdrop" aria-hidden="true" />
-      )}
+      <img src={BLENDER_HEADSHOT_BACKDROP} alt="" className="avatar-blender-backdrop" aria-hidden="true" />
 
       <img
         src={HeadshotNew}
