@@ -767,6 +767,65 @@ def add_polyline_stroke_curve(
     return obj
 
 
+def polyline_length_screen(points_screen: Sequence[Tuple[float, float]]) -> float:
+    total = 0.0
+    for idx in range(1, len(points_screen)):
+        prev = points_screen[idx - 1]
+        curr = points_screen[idx]
+        total += math.hypot(curr[0] - prev[0], curr[1] - prev[1])
+    return total
+
+
+def clip_polyline_min_x(
+    points_screen: Sequence[Tuple[float, float]],
+    min_x: float,
+) -> List[List[Tuple[float, float]]]:
+    clipped: List[List[Tuple[float, float]]] = []
+    current: List[Tuple[float, float]] = []
+
+    def append_current(point: Tuple[float, float]) -> None:
+        if current and math.isclose(current[-1][0], point[0]) and math.isclose(current[-1][1], point[1]):
+            return
+        current.append(point)
+
+    def finish_current() -> None:
+        nonlocal current
+        if len(current) >= 2:
+            clipped.append(current)
+        current = []
+
+    for idx in range(1, len(points_screen)):
+        start = points_screen[idx - 1]
+        end = points_screen[idx]
+        start_inside = start[0] >= min_x
+        end_inside = end[0] >= min_x
+        intersection: Optional[Tuple[float, float]] = None
+
+        if start_inside != end_inside and not math.isclose(start[0], end[0]):
+            t = (min_x - start[0]) / (end[0] - start[0])
+            intersection = (
+                min_x,
+                start[1] + ((end[1] - start[1]) * t),
+            )
+
+        if start_inside and end_inside:
+            append_current(start)
+            append_current(end)
+        elif start_inside and intersection is not None:
+            append_current(start)
+            append_current(intersection)
+            finish_current()
+        elif end_inside:
+            if intersection is not None:
+                append_current(intersection)
+            append_current(end)
+        else:
+            finish_current()
+
+    finish_current()
+    return clipped
+
+
 def add_arc_stroke_curve(
     name: str,
     cx: float,
@@ -814,6 +873,7 @@ def add_corner_outline_icon(
     sy: float,
     material: bpy.types.Material,
     collection: bpy.types.Collection,
+    clip_min_x: Optional[float] = None,
 ) -> List[Tuple[bpy.types.Object, float]]:
     stroke = max(1.0, stroke_width)
     half_stroke = stroke * 0.5
@@ -822,80 +882,47 @@ def add_corner_outline_icon(
     if radial_end < radial_start:
         radial_start, radial_end = radial_end, radial_start
 
-    top_connector = add_polyline_stroke_curve(
-        f"{name_prefix}ConnectorTop",
-        [
-            (cx + radial_start, cy),
-            (cx + radial_end, cy),
-        ],
-        stroke,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        max(2, segments // 8),
-        material,
-        collection,
-    )
-    outer_arc = add_arc_stroke_curve(
-        f"{name_prefix}Outer",
-        cx,
-        cy,
-        outer_radius,
-        0.0,
-        90.0,
-        stroke,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        segments,
-        material,
-        collection,
-    )
-    left_connector = add_polyline_stroke_curve(
-        f"{name_prefix}ConnectorLeft",
-        [
-            (cx, cy + radial_end),
-            (cx, cy + radial_start),
-        ],
-        stroke,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        max(2, segments // 8),
-        material,
-        collection,
-    )
-    inner_arc = add_arc_stroke_curve(
-        f"{name_prefix}Inner",
-        cx,
-        cy,
-        inner_radius,
-        90.0,
-        0.0,
-        stroke,
-        z,
-        frame_width,
-        frame_height,
-        sx,
-        sy,
-        segments,
-        material,
-        collection,
-    )
+    def add_stroke(name: str, points: Sequence[Tuple[float, float]]) -> List[Tuple[bpy.types.Object, float]]:
+        paths = [list(points)] if clip_min_x is None else clip_polyline_min_x(points, clip_min_x)
+        strokes: List[Tuple[bpy.types.Object, float]] = []
+        for path_idx, path in enumerate(paths):
+            if len(path) < 2:
+                continue
+            object_name = name if len(paths) == 1 else f"{name}_{path_idx + 1}"
+            obj = add_polyline_stroke_curve(
+                object_name,
+                path,
+                stroke,
+                z,
+                frame_width,
+                frame_height,
+                sx,
+                sy,
+                max(2, len(path)),
+                material,
+                collection,
+            )
+            strokes.append((obj, max(1e-6, polyline_length_screen(path))))
+        return strokes
+
+    top_connector_points = [
+        (cx + radial_start, cy),
+        (cx + radial_end, cy),
+    ]
+    outer_arc_points = arc_points_screen(cx, cy, outer_radius, 0.0, 90.0, segments)
+    left_connector_points = [
+        (cx, cy + radial_end),
+        (cx, cy + radial_start),
+    ]
+    inner_arc_points = arc_points_screen(cx, cy, inner_radius, 90.0, 0.0, segments)
 
     # Continuous draw order: top connector -> outer arc -> left connector -> inner arc.
-    return [
-        (top_connector, max(1e-6, radial_end - radial_start)),
-        (outer_arc, max(1e-6, (math.pi * 0.5) * outer_radius)),
-        (left_connector, max(1e-6, radial_end - radial_start)),
-        (inner_arc, max(1e-6, (math.pi * 0.5) * inner_radius)),
-    ]
+    return (
+        add_stroke(f"{name_prefix}ConnectorTop", top_connector_points)
+        + add_stroke(f"{name_prefix}Outer", outer_arc_points)
+        + add_stroke(f"{name_prefix}ConnectorLeft", left_connector_points)
+        + add_stroke(f"{name_prefix}Inner", inner_arc_points)
+    )
 
 
 def ellipse_points_screen(
@@ -1596,22 +1623,24 @@ def build_layers(
         collection=overlay_coll,
     )
 
-    # Bottom-right icon: same family, scaled larger; behind red panel, above blue backplate.
+    # Bottom-right icon: animate in the overlay, clipped to keep its behind-panel look.
+    bottom_right_stroke_width = 3
     bottom_right_strokes = add_corner_outline_icon(
         "BottomRightIcon",
         cx=887,
         cy=832,
         inner_radius=BOTTOM_RIGHT_CORNER_ICON_INNER_RADIUS_PX,
         outer_radius=BOTTOM_RIGHT_CORNER_ICON_OUTER_RADIUS_PX,
-        stroke_width=3,
+        stroke_width=bottom_right_stroke_width,
         segments=72,
-        z=-0.22,
+        z=-0.05,
         frame_width=frame_width,
         frame_height=frame_height,
         sx=sx,
         sy=sy,
         material=red_mat,
-        collection=background_coll,
+        collection=overlay_coll,
+        clip_min_x=MAIN_RECT["right"] + (bottom_right_stroke_width * 0.5),
     )
 
     # Plus grids.
