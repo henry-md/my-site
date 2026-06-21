@@ -4210,7 +4210,13 @@ body.ui-light .contact.section {
 
 body.ui-light .contact.section::before,
 body.ui-light .contact.section::after {
-  display: none;
+  display: block;
+  opacity: 0.8;
+  background:
+    radial-gradient(circle at 34% 18%, rgba(135, 92, 255, 0.12), transparent 32%),
+    radial-gradient(circle at 72% 30%, rgba(72, 143, 255, 0.09), transparent 30%),
+    radial-gradient(circle at 18% 82%, rgba(255, 90, 31, 0.07), transparent 34%),
+    radial-gradient(circle at 86% 78%, rgba(166, 98, 255, 0.08), transparent 36%);
 }
 
 body.ui-light .contact.section h2 {
@@ -6259,11 +6265,36 @@ body.ui-light .testimonials .swiper-pagination-bullets {
 body.ui-light .contact.section {
   margin-top: clamp(2rem, 4vw, 3rem);
   padding: clamp(2rem, 4vw, 3rem) 0 clamp(0.8rem, 1.8vw, 1.2rem);
+  isolation: isolate;
+  background: #161e27;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+body.ui-light .contact.section::before {
+  display: block;
+  background:
+    radial-gradient(circle at 18% 70%, rgba(0, 0, 0, 0.86) 0%, rgba(0, 0, 0, 0.52) 7%, rgba(0, 0, 0, 0.18) 14%, transparent 22%),
+    radial-gradient(circle at 56% 46%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.42) 6%, rgba(0, 0, 0, 0.16) 13%, transparent 21%),
+    radial-gradient(circle at 84% 34%, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.48) 7%, rgba(0, 0, 0, 0.18) 14%, transparent 22%);
+}
+
+body.ui-light .contact.section::after {
+  display: block;
+  opacity: 0.58;
+  background:
+    radial-gradient(circle at 36% 26%, rgba(135, 92, 255, 0.13) 0%, rgba(135, 92, 255, 0.06) 7%, transparent 15%),
+    radial-gradient(circle at 74% 32%, rgba(72, 143, 255, 0.1) 0%, rgba(72, 143, 255, 0.045) 7%, transparent 15%),
+    radial-gradient(circle at 22% 82%, rgba(255, 90, 31, 0.065) 0%, rgba(255, 90, 31, 0.03) 7%, transparent 15%);
 }
 
 body.ui-light .contact-form {
   width: min(720px, calc(100% - 2rem));
   gap: 0.54rem;
+  padding: 0;
+}
+
+body.ui-light .contact-form::before {
+  display: none;
 }
 
 body.ui-light .contact-form h2 {
@@ -6271,6 +6302,10 @@ body.ui-light .contact-form h2 {
   max-width: none;
   font-size: clamp(1.9rem, 3.4vw, 2.55rem);
   line-height: 1;
+}
+
+body.ui-light .contact-form h2::before {
+  display: none;
 }
 
 body.ui-light .contact-intro {
@@ -6292,10 +6327,26 @@ body.ui-light .contact.section textarea {
   padding: 0.72rem 0.84rem;
   border-radius: 9px;
   font-size: 0.92rem;
+  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 body.ui-light .contact.section textarea {
   min-height: 132px;
+}
+
+body.ui-light .contact.section input:hover,
+body.ui-light .contact.section textarea:hover {
+  background: rgba(255, 255, 255, 0.085);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+body.ui-light .contact.section input:focus,
+body.ui-light .contact.section textarea:focus {
+  border-color: rgba(255, 90, 31, 0.58);
+  background: rgba(255, 255, 255, 0.095);
+  box-shadow: 0 0 0 3px rgba(255, 90, 31, 0.1);
 }
 
 body.ui-light .contact-footer {
@@ -6310,6 +6361,21 @@ body.ui-light .submit {
   min-width: 160px;
   min-height: 40px;
   border-radius: 9px;
+  background:
+    linear-gradient(#171717, #171717) padding-box,
+    linear-gradient(120deg, rgba(255, 255, 255, 0.18), rgba(135, 92, 255, 0.2), rgba(23, 136, 255, 0.16)) border-box;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+body.ui-light .submit:hover {
+  background:
+    linear-gradient(#1d1d1d, #1d1d1d) padding-box,
+    linear-gradient(120deg, rgba(255, 255, 255, 0.24), rgba(135, 92, 255, 0.3), rgba(23, 136, 255, 0.22)) border-box;
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
 @media (max-width: 900px) {
