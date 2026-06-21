@@ -16,7 +16,7 @@ import {
 } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
 
-import VincentDemo from './assets/vincent-dunn-demo.mov';
+import VincentDemo from './assets/new-vincent-dunn-demo.mov';
 import CheckItOutDemo from './assets/checkitout-demo.mov';
 import ChessHelperDemo from './assets/chess-helper-demo.mov';
 import IntentionSetterDemo from './assets/intention-setter-demo.mov';
@@ -39,15 +39,18 @@ const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
 const PROJECT_REVEAL_THRESHOLD = 0.12;
 const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
+const WORKED_AT_LINKS = [
+  { name: 'NewForm', href: 'https://www.newform.com/' },
+  { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
+  { name: 'Helpful Engineering', href: 'https://helpfulengineering.org/' },
+  { name: 'VincentDunn.com', href: 'https://www.vincentdunn.com/' },
+];
 const LIQUID_GLASS_ALPHA_STOPS = [
   0.02, 0.04, 0.05, 0.08, 0.09, 0.1, 0.11, 0.14, 0.16, 0.2,
   0.22, 0.24, 0.26, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4,
   0.42, 0.44, 0.48, 0.54, 0.56, 0.6, 0.62, 0.66, 0.7, 0.72,
   0.78,
 ];
-const BLENDER_HEADSHOT_BACKDROP = '/generated/headshot-bg/headshot-bg-backdrop.png';
-const BLENDER_HEADSHOT_OVERLAY = '/generated/headshot-bg/headshot-bg-overlay.png';
-const BLENDER_HEADSHOT_OVERLAY_WEBM = '/generated/headshot-bg/headshot-bg-overlay.webm';
 
 function normalizeUiMode(value) {
   if (value === UI_LIGHT || value === UI_DARK) {
@@ -115,23 +118,6 @@ FadeInSection.propTypes = {
 };
 
 function HeroHeadshot({ mobile }) {
-  const [supportsAnimatedOverlay, setSupportsAnimatedOverlay] = React.useState(false);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return;
-    }
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setSupportsAnimatedOverlay(false);
-      return;
-    }
-
-    const probe = document.createElement('video');
-    const vp9Support = probe.canPlayType('video/webm; codecs="vp9"');
-    const canPlayWebmVp9 = vp9Support && vp9Support !== 'no';
-    setSupportsAnimatedOverlay(Boolean(canPlayWebmVp9));
-  }, []);
-
   if (!USE_NEW_PICTURE) {
     return (
       <img
@@ -144,30 +130,13 @@ function HeroHeadshot({ mobile }) {
   }
 
   return (
-    <div className={`avatar-blender-composite ${mobile ? 'mobile-avatar avatar-blender-composite-mobile' : ''}`}>
-      <img src={BLENDER_HEADSHOT_BACKDROP} alt="" className="avatar-blender-backdrop" aria-hidden="true" />
-
+    <div className={`avatar-editorial-composite ${mobile ? 'mobile-avatar avatar-editorial-composite-mobile' : ''}`}>
       <img
         src={HeadshotNew}
         alt="Portrait of Henry Deutsch"
-        className="avatar avatar-blender-person"
+        className="avatar avatar-editorial-person"
         draggable={false}
       />
-      {supportsAnimatedOverlay ? (
-        <video
-          className="avatar-blender-overlay avatar-blender-overlay-video"
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-        >
-          <source src={BLENDER_HEADSHOT_OVERLAY_WEBM} type='video/webm; codecs="vp9"' />
-          <source src={BLENDER_HEADSHOT_OVERLAY_WEBM} type="video/webm" />
-        </video>
-      ) : (
-        <img src={BLENDER_HEADSHOT_OVERLAY} alt="" className="avatar-blender-overlay" aria-hidden="true" />
-      )}
     </div>
   );
 }
@@ -267,8 +236,8 @@ function App() {
         <a href="#home" className="name" onClick={smoothScroll}>Henry Magnus Deutsch</a>
 
         <div className="horizontal-tabs">
-          <a href="#testimonials" onClick={smoothScroll}>Testimonials</a>
           <a href="#featured" onClick={smoothScroll}>Featured Projects</a>
+          <a href="#testimonials" onClick={smoothScroll}>Testimonials</a>
           <a href="#contact" onClick={smoothScroll}>Contact</a>
         </div>
 
@@ -330,10 +299,46 @@ function App() {
 
       <div className="content">
         <div className="header-container" id="home">
+          <div className="hero-video-collage" aria-label="Project highlights">
+            <div className="hero-video-card hero-video-card-chess">
+              <div className="hero-video-frame">
+                <video autoPlay loop muted playsInline preload="metadata" poster={ChessHelperPoster} aria-hidden="true">
+                  <source src={ChessHelperDemo} />
+                </video>
+              </div>
+            </div>
+            <div className="hero-video-card hero-video-card-intention">
+              <div className="hero-video-frame">
+                <video autoPlay loop muted playsInline preload="metadata" poster={IntentionSetterPoster} aria-hidden="true">
+                  <source src={IntentionSetterDemo} />
+                </video>
+              </div>
+              <p className="hero-video-caption">See my actual doxxed social media use</p>
+            </div>
+            <div className="hero-video-card hero-video-card-vincent">
+              <div className="hero-video-frame">
+                <video autoPlay loop muted playsInline preload="metadata" poster={VincentPoster} aria-hidden="true">
+                  <source src={VincentDemo} />
+                </video>
+              </div>
+              <p className="hero-video-caption">Freelance: New site increased client book sales 3x</p>
+            </div>
+            <div className="hero-video-card hero-video-card-checkout">
+              <div className="hero-video-frame">
+                <video autoPlay loop muted playsInline preload="metadata" poster={CheckItOutPoster} aria-hidden="true">
+                  <source src={CheckItOutDemo} />
+                </video>
+              </div>
+              <p className="hero-video-caption">Won 3rd / 43 teams at HopHacks Hackathon</p>
+            </div>
+          </div>
+
           <div className="header">
             <div className="header-text fade-up">
               <p className="subhead-small">Full Stack Developer</p>
-              <p className="subhead-rainbow">Hi, I&apos;m Henry</p>
+              <div className="hero-title-row">
+                <p className="subhead-rainbow">Hi, I&apos;m Henry</p>
+              </div>
               <p className={`subhead-big ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>
                 Software Engineer with experience shipping large-scale, revenue-driving systems. {/* jhu-span */}
               </p>
@@ -344,22 +349,52 @@ function App() {
                 <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get In Touch</a>
               </div>
 
-              <HeroHeadshot mobile />
-            </div>
+              <div className="hero-company-strip" aria-label="Companies and teams Henry has worked at">
+                <span className="hero-company-label">Worked at</span>
+                <span className="hero-company-divider hero-company-divider-label" aria-hidden="true">|</span>
+                {WORKED_AT_LINKS.map((company, index) => (
+                  <React.Fragment key={company.href}>
+                    {index > 0 && (
+                      <span className="hero-company-divider" aria-hidden="true">|</span>
+                    )}
+                    <a
+                      className="hero-company-name hero-company-link"
+                      href={company.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Visit ${company.name}`}
+                    >
+                      {company.name}
+                    </a>
+                  </React.Fragment>
+                ))}
+              </div>
 
-            <div className="header-image fade-left">
-              <HeroHeadshot />
             </div>
           </div>
         </div>
 
-        <div className="testimonials section" id="testimonials">
-          <h2>Testimonials</h2>
-          <TestimonialSwiper />
+        <div className="hero-section-break-flyer" aria-hidden="true">
+          <div className="hero-flying-me">
+            <img
+              className="hero-flying-me-photo"
+              src={HeadshotNew}
+              alt=""
+              draggable={false}
+            />
+            <div className="hero-flying-me-callout">
+              <span>Me</span>
+              <svg viewBox="0 0 92 34" focusable="false">
+                <path d="M88 16C70 4 45 4 18 16" />
+                <path d="M18 16l14-10" />
+                <path d="M18 16l14 11" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div className="projects section" id="featured">
-          <h2>Featured Work</h2>
+          <h2>Featured Work & Projects</h2>
 
           <FadeInSection key="0">
             <FeaturedProject
@@ -368,6 +403,8 @@ function App() {
               alt="Chess Helper project demo"
               title="ChessHelper: An Interactive Way to Practice Chess Theory"
               description="Full stack web app for practicing chess opening theory. Users can sign in, save projects, and go through an interactive tutorial. Features move validation, progress tracking, and configurable practice settings like playing as either color. Built node/tree based PGN parsing logic."
+              eyebrow="Case study 01 / Product engineering"
+              tags={['React', 'Node', 'Chess logic', 'Product UX']}
               callToAction="View Project"
               callToActionLink="https://chess-helper-frontend-production.up.railway.app/"
               secondCallToAction="View GitHub"
@@ -382,6 +419,8 @@ function App() {
               alt="Intention Setter project"
               title="Intention Setter: Set Limits On Chrome Websites"
               description="Chrome extension to help set and track limits across websites to avoid doomscrolling. Manifest V3 architecture with a service worker tracking active timers, content scripts monitoring page visibility, and real-time Firebase sync to persist usage data and rules across devices. Users can view analytics on a Next.js dashboard to visualize browsing patterns."
+              eyebrow="Chrome extension / Behavior design"
+              tags={['Chrome API', 'Next.js', 'Analytics', 'Firebase']}
               callToAction="View My Usage"
               callToActionLink="https://intention-setting-production.up.railway.app/henrymdeutsch"
               secondCallToAction="View GitHub"
@@ -397,6 +436,8 @@ function App() {
               alt="Ray Tracer project"
               title="Ray Tracer in C++"
               description="Built ray tracing engine with C++, OpenGL, and multithreading, achieving a 2.5x speedup over the single-thread approach. Engineered a 3D rendering pipeline with GLSL shaders and computational geometry intersection algorithms. Developed Phong illumination with quaternion camera controls, bilinear texture mapping, and ray shadow systems."
+              eyebrow="Systems / Graphics"
+              tags={['OpenGL', 'GLSL', 'Multithreading', 'Geometry']}
               callToAction="View GitHub"
               callToActionLink="https://github.com/henry-md/ray-tracer"
             />
@@ -409,6 +450,8 @@ function App() {
               alt="Vincent Dunn website demo"
               title="Vincent Dunn's Website"
               description="Improved SEO, increasing traffic from under 100 to over 3.6K visits per month and book royalties from $8K to roughly $24K YoY. Used a custom Java-based PDF parser to extract structured content from 200+ pages and generate HTML and CSS layouts."
+              eyebrow="SEO rebuild / Revenue impact"
+              tags={['SEO', 'Java parser', 'Static content', 'UX rewrite']}
               callToAction="View Site"
               callToActionLink="https://www.vincentdunn.com"
             />
@@ -421,10 +464,17 @@ function App() {
               alt="Check It Out project demo"
               title="CheckItOut: Computer Vision Powered Solution to Checkout"
               description="Built a physical checkout counter with an integrated scale, overhead camera, and processing unit for automatic detection and classification of grocery items. Developed a lightweight classifier and detector using MobileNetV2 with robust real-world accuracy."
+              eyebrow="Computer vision / Hardware prototype"
+              tags={['MobileNetV2', 'Hardware', 'Classification', 'Prototype']}
               callToAction="View Devpost"
               callToActionLink="https://devpost.com/software/check-it-out"
             />
           </FadeInSection>
+        </div>
+
+        <div className="testimonials section" id="testimonials">
+          <h2>Testimonials</h2>
+          <TestimonialSwiper />
         </div>
 
         <div className="contact section" id="contact">

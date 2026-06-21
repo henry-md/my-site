@@ -21,15 +21,15 @@ export const BACKGROUND_CONFIGS: BackgroundConfig[] = [
     label: 'hexagon-3d',
     uiMode: 'light',
     canvasType: 'hexagon-3d',
-    canvasOpacity: 1,
+    canvasOpacity: 0,
   },
   {
     id: 'bird',
     label: 'bird',
     uiMode: 'light',
     canvasType: 'birds',
-    canvasOpacity: 1,
+    canvasOpacity: 0.18,
   },
 ];
 
-export const DEFAULT_BACKGROUND_ID = 'bird';
+export const DEFAULT_BACKGROUND_ID = 'hexagon-3d';
