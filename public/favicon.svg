@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Henry Deutsch">
+  <rect width="512" height="512" rx="112" fill="#fffaf2"/>
+  <path
+    fill="#201c17"
+    d="M206.62 375.14L146.32 375.14L146.32 124.86L206.62 124.86L206.62 225.31L305.38 225.31L305.38 124.86L365.68 124.86L365.68 375.14L305.38 375.14L305.38 274.52L206.62 274.52L206.62 375.14Z"
+  />
+  <rect x="204" y="404" width="104" height="16" rx="8" fill="#ff5a1f"/>
+</svg>
