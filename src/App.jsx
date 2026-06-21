@@ -385,7 +385,7 @@ function App() {
                   <source src={IntentionSetterDemo} />
                 </video>
               </div>
-              <p className="hero-video-caption">See my actual doxxed social media use</p>
+              <p className="hero-video-caption">See my actual doxxed social media use<br />(tell me to get back to work: 914 272 5561)</p>
             </a>
             <a
               className="hero-video-card hero-video-card-vincent"
