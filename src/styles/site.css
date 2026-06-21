@@ -5308,3 +5308,467 @@ body.ui-light .hero-video-card-checkout {
   }
 }
 
+/* Wordmark/caption polish. */
+body.ui-light .hero-title-row .subhead-rainbow {
+  color: #161513;
+  -webkit-text-fill-color: #161513;
+}
+
+body.ui-light .subhead-big {
+  color: #24221e;
+  font-weight: 690;
+}
+
+body.ui-light .hero-meta {
+  color: #77736b;
+}
+
+body.ui-light .hero-video-card {
+  width: clamp(246px, 19.4vw, 392px);
+}
+
+body.ui-light .hero-video-frame {
+  border-radius: 11px;
+  box-shadow:
+    0 18px 48px rgba(31, 28, 24, 0.13),
+    0 0 0 6px rgba(255, 255, 255, 0.48);
+}
+
+body.ui-light .hero-video-caption {
+  margin-top: 0.04rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #1f1d1a;
+  box-shadow: none;
+  font-family: 'Plus Jakarta Sans', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(0.62rem, 0.72vw, 0.72rem);
+  font-weight: 760;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+body.ui-light .hero-video-card-chess,
+body.ui-light .hero-video-card-intention,
+body.ui-light .hero-video-card-vincent,
+body.ui-light .hero-video-card-checkout {
+  width: clamp(246px, 19.4vw, 392px);
+}
+
+body.ui-light .hero-video-card-chess {
+  left: clamp(24px, 3.2vw, 70px);
+}
+
+body.ui-light .hero-video-card-intention {
+  left: clamp(32px, 3.8vw, 84px);
+}
+
+body.ui-light .hero-video-card-vincent {
+  right: clamp(24px, 3.2vw, 70px);
+}
+
+body.ui-light .hero-video-card-checkout {
+  right: clamp(32px, 3.8vw, 84px);
+}
+
+body.ui-light .hero-company-strip {
+  flex-direction: column;
+  gap: clamp(0.46rem, 0.95svh, 0.62rem);
+  width: min(660px, 88vw);
+  max-width: min(660px, 88vw);
+  margin-top: clamp(0.84rem, 1.5svh, 1.08rem);
+}
+
+body.ui-light .hero-company-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  color: #8a8378;
+  font-size: 0.62rem;
+  font-weight: 840;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+body.ui-light .hero-company-strip span:not(:first-child)::before,
+body.ui-light .hero-company-strip span:first-child::before {
+  content: none;
+}
+
+body.ui-light .hero-logo-marquee {
+  width: min(620px, 100%);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+body.ui-light .hero-logo-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  gap: clamp(1.35rem, 2.6vw, 2.2rem);
+  animation: hero-wordmark-scroll 28s linear infinite;
+}
+
+body.ui-light .hero-wordmark {
+  flex: 0 0 auto;
+  color: rgba(22, 21, 19, 0.58);
+  font-size: clamp(0.92rem, 1.3vw, 1.18rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.ui-light .hero-wordmark-newform {
+  color: rgba(17, 16, 14, 0.68);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.05rem, 1.55vw, 1.36rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+body.ui-light .hero-wordmark-knowhiz {
+  font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+body.ui-light .hero-wordmark-helpful {
+  font-family: 'Manrope', 'Avenir Next', sans-serif;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+body.ui-light .hero-wordmark-vincent {
+  font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+  font-size: clamp(0.86rem, 1.2vw, 1.06rem);
+  font-weight: 760;
+  letter-spacing: 0.01em;
+}
+
+@keyframes hero-wordmark-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - clamp(0.675rem, 1.3vw, 1.1rem)));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-flying-me,
+  .hero-flying-me-photo {
+    animation: none;
+  }
+
+  .hero-flying-me {
+    transform: translateX(clamp(14px, 7vw, 72px)) rotate(-8deg);
+  }
+
+  body.ui-light .hero-logo-track {
+    animation: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  body.ui-light .hero-video-card-chess,
+  body.ui-light .hero-video-card-intention,
+  body.ui-light .hero-video-card-vincent,
+  body.ui-light .hero-video-card-checkout {
+    width: clamp(222px, 18.6vw, 286px);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero-section-break-flyer {
+    display: none;
+  }
+
+  .hero-flying-me {
+    bottom: 8px;
+    width: clamp(58px, 17vw, 82px);
+  }
+
+  .hero-flying-me-callout {
+    font-size: 0.84rem;
+  }
+
+  .hero-flying-me-callout svg {
+    width: 48px;
+    stroke-width: 4.6;
+  }
+
+  body.ui-light .hero-logo-marquee {
+    width: min(330px, 100%);
+    overflow: visible;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  body.ui-light .hero-logo-track {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.52rem 1rem;
+    animation: none;
+  }
+
+  body.ui-light .hero-logo-track .hero-wordmark:nth-child(n + 5) {
+    display: none;
+  }
+
+  body.ui-light .hero-wordmark {
+    color: rgba(22, 21, 19, 0.58);
+    font-size: 0.82rem;
+  }
+
+  body.ui-light .hero-wordmark-newform {
+    font-size: 0.96rem;
+  }
+}
+
+/* Final typography/caption pass: keep the intentional hand-drawn "Me" moment,
+   but make the core hero feel calmer and native to the striped white field. */
+body.ui-light .subhead-small {
+  color: rgba(83, 76, 67, 0.82);
+  font-family: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(0.66rem, 0.78vw, 0.74rem);
+  font-weight: 800;
+  letter-spacing: 0.24em;
+}
+
+body.ui-light .subhead-small::before {
+  background: #ff6330;
+  box-shadow: 0 0 0 5px rgba(255, 99, 48, 0.12);
+}
+
+body.ui-light .hero-title-row .subhead-rainbow {
+  color: #221d17;
+  -webkit-text-fill-color: #221d17;
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(3.45rem, min(6vw, 10.8svh), 5.72rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  word-spacing: 0.025em;
+}
+
+body.ui-light .subhead-big {
+  max-width: 28ch;
+  color: #342e26;
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(1.18rem, min(1.92vw, 3.24svh), 1.92rem);
+  font-weight: 650;
+  line-height: 1.1;
+  letter-spacing: -0.018em;
+}
+
+body.ui-light .hero-meta {
+  color: rgba(92, 86, 77, 0.82);
+  font-size: clamp(0.92rem, 1vw, 1rem);
+  font-weight: 500;
+}
+
+body.ui-light .hero-video-card-chess,
+body.ui-light .hero-video-card-intention,
+body.ui-light .hero-video-card-vincent,
+body.ui-light .hero-video-card-checkout {
+  width: clamp(286px, 21.6vw, 408px);
+  opacity: 1;
+}
+
+body.ui-light .hero-video-card-chess .hero-video-frame {
+  opacity: 0.7;
+}
+
+body.ui-light .hero-video-card-intention .hero-video-frame {
+  opacity: 0.72;
+}
+
+body.ui-light .hero-video-card-vincent .hero-video-frame {
+  opacity: 0.82;
+}
+
+body.ui-light .hero-video-card-checkout .hero-video-frame {
+  opacity: 0.74;
+}
+
+body.ui-light .hero-video-frame {
+  border: 1px solid rgba(31, 28, 23, 0.11);
+  border-radius: 10px;
+  box-shadow:
+    0 18px 44px rgba(37, 31, 23, 0.12),
+    0 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+body.ui-light .hero-video-caption {
+  max-width: none;
+  margin-top: 0.28rem;
+  color: #1f1d1a;
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(0.58rem, 0.66vw, 0.66rem);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.006em;
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+body.ui-light .hero-company-strip {
+  gap: clamp(0.38rem, 0.8svh, 0.54rem);
+  margin-top: clamp(0.82rem, 1.45svh, 1.06rem);
+}
+
+body.ui-light .hero-company-label {
+  color: rgba(116, 106, 94, 0.74);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+body.ui-light .hero-logo-marquee {
+  width: min(500px, 100%);
+  height: 1.3rem;
+  opacity: 0.92;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+body.ui-light .hero-logo-track {
+  gap: clamp(1.15rem, 2.2vw, 1.8rem);
+  animation-duration: 34s;
+}
+
+body.ui-light .hero-wordmark,
+body.ui-light .hero-wordmark-newform,
+body.ui-light .hero-wordmark-knowhiz,
+body.ui-light .hero-wordmark-helpful,
+body.ui-light .hero-wordmark-vincent {
+  color: rgba(46, 40, 32, 0.45);
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(0.76rem, 1.04vw, 0.92rem);
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body.ui-light .hero-wordmark-helpful {
+  font-weight: 620;
+}
+
+body.ui-light .hero-wordmark-vincent {
+  font-size: clamp(0.72rem, 0.98vw, 0.86rem);
+  letter-spacing: 0;
+}
+
+@media (max-height: 820px) and (min-width: 901px) {
+  body.ui-light .hero-title-row .subhead-rainbow {
+    font-size: clamp(3.08rem, min(5.7vw, 9.8svh), 5.08rem);
+  }
+
+  body.ui-light .subhead-big {
+    font-size: clamp(1.08rem, min(1.72vw, 2.9svh), 1.64rem);
+  }
+}
+
+@media (max-width: 1180px) {
+  body.ui-light .hero-video-card-chess,
+  body.ui-light .hero-video-card-intention,
+  body.ui-light .hero-video-card-vincent,
+  body.ui-light .hero-video-card-checkout {
+    width: clamp(248px, 21.2vw, 306px);
+  }
+
+  body.ui-light .hero-video-caption {
+    max-width: none;
+  }
+}
+
+@media (max-width: 900px) {
+  body.ui-light .hero-title-row .subhead-rainbow {
+    font-size: clamp(2.64rem, 10.6vw, 3.12rem);
+  }
+
+  body.ui-light .hero-logo-marquee {
+    height: auto;
+  }
+
+  body.ui-light .hero-wordmark,
+  body.ui-light .hero-wordmark-newform,
+  body.ui-light .hero-wordmark-knowhiz,
+  body.ui-light .hero-wordmark-helpful,
+  body.ui-light .hero-wordmark-vincent {
+    font-size: 0.78rem;
+  }
+}
+
+/* Follow-up polish after screenshot inspection. */
+body.ui-light .hero-title-row .subhead-rainbow {
+  color: #211c16;
+  -webkit-text-fill-color: #211c16;
+  font-size: clamp(3.5rem, min(6.08vw, 10.9svh), 5.82rem);
+  font-weight: 720;
+  letter-spacing: -0.033em;
+}
+
+body.ui-light .subhead-big {
+  max-width: 29ch;
+  color: rgba(50, 44, 36, 0.94);
+  font-family: 'Manrope', 'Inter Tight', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(1.15rem, min(1.74vw, 3svh), 1.72rem);
+  font-weight: 720;
+  line-height: 1.13;
+  letter-spacing: -0.021em;
+}
+
+body.ui-light .hero-meta {
+  color: rgba(92, 84, 73, 0.76);
+}
+
+body.ui-light .hero-video-caption {
+  max-width: none;
+  margin-top: 0.32rem;
+  color: rgba(50, 44, 36, 0.94);
+  font-size: clamp(0.62rem, 0.72vw, 0.72rem);
+  font-weight: 760;
+  line-height: 1.14;
+  white-space: nowrap;
+  text-wrap: nowrap;
+}
+
+body.ui-light .hero-logo-marquee {
+  width: min(440px, 100%);
+  opacity: 1;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 16%, #000 84%, transparent);
+}
+
+body.ui-light .hero-logo-track {
+  gap: clamp(1rem, 1.85vw, 1.48rem);
+  animation-duration: 42s;
+}
+
+body.ui-light .hero-wordmark,
+body.ui-light .hero-wordmark-newform,
+body.ui-light .hero-wordmark-knowhiz,
+body.ui-light .hero-wordmark-helpful,
+body.ui-light .hero-wordmark-vincent {
+  color: rgba(42, 37, 30, 0.58);
+  font-size: clamp(0.74rem, 0.98vw, 0.88rem);
+  font-weight: 700;
+}
+
+body.ui-light .hero-wordmark-helpful {
+  font-weight: 660;
+}
+
+@media (max-height: 820px) and (min-width: 901px) {
+  body.ui-light .subhead-big {
+    font-size: clamp(1.06rem, min(1.58vw, 2.72svh), 1.5rem);
+  }
+}
+
