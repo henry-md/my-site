@@ -5772,3 +5772,237 @@ body.ui-light .hero-wordmark-helpful {
   }
 }
 
+/* Static company line: distinct from the reference site's moving logo rail. */
+body.ui-light .hero-company-strip {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  max-width: min(720px, 92vw);
+  gap: 0;
+  margin-top: clamp(0.82rem, 1.45svh, 1.06rem);
+  text-align: center;
+}
+
+body.ui-light .hero-company-label,
+body.ui-light .hero-company-name {
+  font-family: 'Manrope', 'Inter Tight', 'Avenir Next', 'Segoe UI', sans-serif;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+body.ui-light .hero-company-label {
+  color: rgba(111, 101, 88, 0.72);
+  font-size: 0.58rem;
+  font-weight: 820;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+body.ui-light .hero-company-name {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(41, 36, 29, 0.82);
+  font-size: clamp(0.72rem, 0.9vw, 0.84rem);
+  font-weight: 760;
+  letter-spacing: -0.012em;
+}
+
+body.ui-light .hero-company-strip .hero-company-name::before {
+  content: none !important;
+}
+
+body.ui-light .hero-company-link {
+  padding: 0.16rem 0.22rem;
+  margin: -0.16rem -0.22rem;
+  text-decoration-color: rgba(255, 90, 31, 0.42);
+}
+
+body.ui-light .hero-company-link:hover,
+body.ui-light .hero-company-link:focus-visible {
+  color: #111111;
+  background: rgba(255, 90, 31, 0.12);
+  box-shadow: none;
+}
+
+body.ui-light .hero-company-divider {
+  color: rgba(35, 30, 24, 0.25);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  margin-inline: 0.58rem;
+}
+
+@media (max-width: 900px) {
+  body.ui-light .hero-company-strip {
+    max-width: 340px;
+    row-gap: 0.58rem;
+  }
+
+  body.ui-light .hero-company-label {
+    flex-basis: 100%;
+  }
+
+  body.ui-light .hero-company-divider-label {
+    display: none;
+  }
+
+  body.ui-light .hero-company-name {
+    font-size: 0.76rem;
+  }
+
+  body.ui-light .hero-company-divider {
+    margin-inline: 0.44rem;
+  }
+}
+
+/* Below-fold compact editorial pass: match the lighter hero language without
+   turning project cards into tall case-study slabs. */
+body.ui-light .section {
+  max-width: min(1120px, calc(100% - 48px));
+  padding-top: clamp(2.6rem, 4.8vw, 4.35rem);
+  scroll-margin-top: clamp(88px, 10svh, 118px);
+}
+
+body.ui-light .projects.section {
+  margin-top: 0;
+}
+
+body.ui-light .section h2 {
+  margin: 0 0 clamp(1rem, 2vw, 1.35rem);
+  color: #201c17;
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(2.05rem, 3.25vw, 3.25rem);
+  font-weight: 720;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+body.ui-light .section h2::before {
+  width: 42px;
+  height: 2px;
+  margin-bottom: 0.62rem;
+  background: rgba(32, 28, 23, 0.92);
+}
+
+body.ui-light .featured-project,
+body.ui-light .projects .fade-in-section:first-of-type .featured-project {
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(0.9rem, 2vw, 1.45rem);
+  padding: clamp(0.68rem, 1.25vw, 0.95rem);
+  margin-bottom: clamp(0.68rem, 1.25vw, 0.95rem);
+  border-radius: 10px;
+  border: 1px solid rgba(32, 28, 23, 0.1);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 14px 36px rgba(35, 30, 24, 0.07);
+}
+
+body.ui-light .featured-media-wrap {
+  align-self: center;
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(32, 28, 23, 0.1);
+  background: #111313;
+}
+
+body.ui-light .featured-media-wrap::before {
+  display: none;
+}
+
+body.ui-light .featured-video,
+body.ui-light .projects .fade-in-section:first-of-type .featured-video {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: #111313;
+  object-fit: contain;
+  object-position: center;
+}
+
+body.ui-light .featured-text {
+  gap: clamp(0.46rem, 0.9vw, 0.62rem);
+  padding: clamp(0.1rem, 0.8vw, 0.35rem);
+}
+
+body.ui-light .featured-eyebrow {
+  color: #ff5a1f;
+  font-size: clamp(0.56rem, 0.7vw, 0.64rem);
+  font-weight: 830;
+  letter-spacing: 0.17em;
+}
+
+body.ui-light .featured-title,
+body.ui-light .projects .fade-in-section:first-of-type .featured-title {
+  color: #201c17;
+  font-family: 'Inter Tight', 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
+  font-size: clamp(1.18rem, 1.72vw, 1.72rem);
+  font-weight: 730;
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+}
+
+body.ui-light .featured-description {
+  color: rgba(74, 70, 64, 0.9);
+  font-size: clamp(0.82rem, 0.94vw, 0.92rem);
+  line-height: 1.42;
+}
+
+body.ui-light .featured-metrics {
+  display: none !important;
+}
+
+body.ui-light .featured-tags {
+  gap: 0.34rem;
+}
+
+body.ui-light .featured-tags span {
+  min-height: 23px;
+  padding: 0.2rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(32, 28, 23, 0.045);
+  border-color: rgba(32, 28, 23, 0.09);
+  color: rgba(46, 42, 36, 0.84);
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+body.ui-light .featured-call-container {
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+}
+
+body.ui-light .featured-call {
+  min-height: 40px;
+  padding: 0.62rem 1.12rem;
+  border-radius: 9px;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 900px) {
+  body.ui-light .section {
+    max-width: min(100% - 32px, 620px);
+    padding-top: clamp(2.2rem, 8vw, 3.25rem);
+    scroll-margin-top: 92px;
+  }
+
+  body.ui-light .section h2 {
+    font-size: clamp(1.95rem, 9vw, 2.7rem);
+  }
+
+  body.ui-light .featured-project,
+  body.ui-light .projects .fade-in-section:first-of-type .featured-project {
+    grid-template-columns: 1fr;
+    gap: 0.82rem;
+    padding: 0.72rem;
+  }
+
+  body.ui-light .featured-description {
+    line-height: 1.46;
+  }
+}
+
