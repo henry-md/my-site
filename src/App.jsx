@@ -508,6 +508,7 @@ function App() {
               tags={['SEO', 'Java parser', 'Static content', 'UX rewrite']}
               callToAction="View Site"
               callToActionLink="https://www.vincentdunn.com"
+              mediaClassName="featured-media-vincent"
             />
           </FadeInSection>
 
@@ -522,6 +523,7 @@ function App() {
               tags={['MobileNetV2', 'Hardware', 'Classification', 'Prototype']}
               callToAction="View Devpost"
               callToActionLink="https://devpost.com/software/check-it-out"
+              mediaClassName="featured-media-checkitout"
             />
           </FadeInSection>
         </div>

@@ -5648,6 +5648,7 @@ body.ui-light .hero-video-card-intention video {
 
 body.ui-light .hero-video-card-vincent video {
   opacity: 0.82;
+  object-position: center top;
 }
 
 body.ui-light .hero-video-card-checkout video {
@@ -5972,6 +5973,27 @@ body.ui-light .projects .fade-in-section:first-of-type .featured-video {
   background: #111313;
   object-fit: contain;
   object-position: center;
+}
+
+body.ui-light .featured-video.featured-media-vincent {
+  object-fit: cover;
+  object-position: center top;
+}
+
+body.ui-light .featured-media-wrap.featured-media-vincent {
+  border-color: transparent;
+  background: #ffffff;
+}
+
+body.ui-light .featured-media-wrap.featured-media-checkitout {
+  border-color: transparent;
+  background: #ffffff;
+}
+
+body.ui-light .featured-video.featured-media-checkitout {
+  object-fit: cover;
+  object-position: center;
+  background: #ffffff;
 }
 
 body.ui-light .featured-text {

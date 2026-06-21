@@ -85,20 +85,23 @@ class FeaturedProject extends React.Component {
       thirdCallToActionLink,
       eyebrow,
       tags,
+      mediaClassName,
     } = this.props;
     const { mediaOutlineColor } = this.state;
     const mediaStyle = mediaOutlineColor ? { '--featured-media-outline': mediaOutlineColor } : undefined;
+    const mediaWrapClassName = ['featured-media-wrap', mediaClassName].filter(Boolean).join(' ');
+    const mediaElementClassName = ['featured-video', mediaClassName].filter(Boolean).join(' ');
 
     return (
       <div className="featured-project fade-up">
-        <div className="featured-media-wrap">
+        <div className={mediaWrapClassName}>
           {src ? (
-            <video className="featured-video" autoPlay loop muted playsInline poster={poster} draggable={false} style={mediaStyle}>
+            <video className={mediaElementClassName} autoPlay loop muted playsInline poster={poster} draggable={false} style={mediaStyle}>
               <source src={src}></source>
               Your browser does not support this video format.
             </video>
           ) : (
-            <img className="featured-video" src={poster} alt={alt} loading="lazy" draggable={false} style={mediaStyle} />
+            <img className={mediaElementClassName} src={poster} alt={alt} loading="lazy" draggable={false} style={mediaStyle} />
           )}
         </div>
 
@@ -140,6 +143,7 @@ FeaturedProject.propTypes = {
   thirdCallToActionLink: PropTypes.string,
   eyebrow: PropTypes.string,
   tags: PropTypes.arrayOf(PropTypes.string),
+  mediaClassName: PropTypes.string,
 };
 
 export default FeaturedProject;
