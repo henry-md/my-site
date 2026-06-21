@@ -83,24 +83,34 @@ class FeaturedProject extends React.Component {
       secondCallToActionLink,
       thirdCallToAction,
       thirdCallToActionLink,
+      eyebrow,
+      tags,
     } = this.props;
     const { mediaOutlineColor } = this.state;
     const mediaStyle = mediaOutlineColor ? { '--featured-media-outline': mediaOutlineColor } : undefined;
 
     return (
       <div className="featured-project fade-up">
-        {src ? (
-          <video className="featured-video" autoPlay loop muted playsInline poster={poster} draggable={false} style={mediaStyle}>
-            <source src={src}></source>
-            Your browser does not support this video format.
-          </video>
-        ) : (
-          <img className="featured-video" src={poster} alt={alt} loading="lazy" draggable={false} style={mediaStyle} />
-        )}
+        <div className="featured-media-wrap">
+          {src ? (
+            <video className="featured-video" autoPlay loop muted playsInline poster={poster} draggable={false} style={mediaStyle}>
+              <source src={src}></source>
+              Your browser does not support this video format.
+            </video>
+          ) : (
+            <img className="featured-video" src={poster} alt={alt} loading="lazy" draggable={false} style={mediaStyle} />
+          )}
+        </div>
 
         <div className="featured-text">
+          {eyebrow ? <p className="featured-eyebrow">{eyebrow}</p> : null}
           <p className="featured-title sub-head">{title}</p>
           <p className="featured-description">{description}</p>
+          {tags && tags.length > 0 ? (
+            <div className="featured-tags" aria-label={`${title} technology and scope`}>
+              {tags.map((tag) => <span key={tag}>{tag}</span>)}
+            </div>
+          ) : null}
           <div className="featured-call-container">
             <a href={callToActionLink} className="dark-button featured-call" target="_blank" rel="noreferrer">{callToAction}</a>
             {secondCallToAction && (
@@ -128,6 +138,8 @@ FeaturedProject.propTypes = {
   secondCallToActionLink: PropTypes.string,
   thirdCallToAction: PropTypes.string,
   thirdCallToActionLink: PropTypes.string,
+  eyebrow: PropTypes.string,
+  tags: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default FeaturedProject;
