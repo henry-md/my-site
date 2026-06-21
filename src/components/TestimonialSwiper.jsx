@@ -1,6 +1,6 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
+import { Navigation, Pagination } from 'swiper/modules';
 import vincent from '../assets/vincent-dunn.jpeg';
 import logan from '../assets/logan-ye.png';
 import james from '../assets/james-butler.jpeg';
@@ -10,6 +10,7 @@ import {
   TESTIMONIAL_SPACE_BETWEEN_PX,
 } from '../constants.ts';
 import 'swiper/css';
+import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 class TestimonialSwiper extends React.Component {
@@ -44,6 +45,7 @@ class TestimonialSwiper extends React.Component {
 
   setupTestimonials = () => {
     const containers = document.querySelectorAll('.expandable-container');
+    const shouldCollapse = window.innerWidth <= TESTIMONIAL_DESKTOP_BREAKPOINT_PX;
     
     containers.forEach(container => {
       const content = container.querySelector('.expandable-content');
@@ -52,8 +54,12 @@ class TestimonialSwiper extends React.Component {
       // Remove existing event listener if any
       button.removeEventListener('click', button.toggleTextHandler);
       
-      // Check if content overflows
-      if (content.scrollHeight > this.maxCollapsedHeight) {
+      if (!shouldCollapse) {
+        container.classList.remove('expanded');
+        content.style.maxHeight = 'none';
+        content.classList.remove('gradient-hide');
+        button.classList.remove('visible');
+      } else if (content.scrollHeight > this.maxCollapsedHeight) {
         button.classList.add('visible');
         // Create a new handler and store it on the button element
         button.toggleTextHandler = () => this.toggleText(container, button, content);
@@ -85,7 +91,6 @@ class TestimonialSwiper extends React.Component {
   }
 
   getSlidesPerView() {
-    if (window.innerWidth > TESTIMONIAL_DESKTOP_BREAKPOINT_PX) return 2;
     return 1;
   }
 
@@ -99,8 +104,9 @@ class TestimonialSwiper extends React.Component {
         spaceBetween={TESTIMONIAL_SPACE_BETWEEN_PX}
         slidesPerView={this.state.slidesPerView}
         loop={true}
+        navigation={true}
         pagination={{ clickable: true }}
-        modules={[Pagination]}
+        modules={[Navigation, Pagination]}
       >
         <SwiperSlide>
           <div className="quote-content">

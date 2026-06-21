@@ -22,7 +22,7 @@ function ContactForm() {
   return (
     <form className="contact-form" onSubmit={handleSubmitWithCallback}>
       <h2>Get In Touch!</h2>
-      <p className="contact-intro">Let me know what you&apos;re building. Messages go right to my inbox.</p>
+      <p className="contact-intro">Let me know what you&apos;re building <b>:</b>o</p>
 
       <div className="name-email">
         <div className="field-wrap">
@@ -72,7 +72,7 @@ function ContactForm() {
       </div>
 
       <div className="contact-footer">
-        <p className="contact-note">Typical response within 24 hours.</p>
+        <p className="contact-note"></p>
         <button type="submit" className="dark-button submit" disabled={state.submitting}>
           {state.submitting ? 'Sending...' : 'Send Message'}
         </button>
