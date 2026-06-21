@@ -1,6 +1,11 @@
 export const ABOVE_FOLD_TEXT_SHIMMERS = false;
 export const MENU_BAR_STAYS_AT_TOP = true;
 export const USE_NEW_PICTURE = true;
+export const ME_ANIMATION_STYLES = {
+  ME_ANIMATION_ABOVE_FOLD: 'ME_ANIMATION_ABOVE_FOLD',
+  MOVE_VIDEOS: 'MOVE_VIDEOS',
+} as const;
+export const ME_ANIMATION_STYLE = ME_ANIMATION_STYLES.ME_ANIMATION_ABOVE_FOLD;
 export const DEBUG_UI =
   String(
     (import.meta as ImportMeta & { env: { VITE_DEBUG_UI?: string } }).env.VITE_DEBUG_UI

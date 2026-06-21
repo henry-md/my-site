@@ -12,6 +12,8 @@ import {
   DEBUG_UI,
   liquid_glass_opacity,
   MENU_BAR_STAYS_AT_TOP,
+  ME_ANIMATION_STYLE,
+  ME_ANIMATION_STYLES,
   USE_NEW_PICTURE,
 } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
@@ -39,6 +41,11 @@ const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
 const PROJECT_REVEAL_THRESHOLD = 0.12;
 const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
+const ME_ANIMATION_CLASS_BY_STYLE = {
+  [ME_ANIMATION_STYLES.ME_ANIMATION_ABOVE_FOLD]: 'me-animation-above-fold',
+  [ME_ANIMATION_STYLES.MOVE_VIDEOS]: 'me-animation-move-videos',
+};
+const ME_ANIMATION_CLASS = ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLE] || ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLES.ME_ANIMATION_ABOVE_FOLD];
 const WORKED_AT_LINKS = [
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
@@ -210,6 +217,53 @@ function App() {
   }, [activeUiMode, selectedTheme.id, uiModePreference]);
 
   React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const rootStyle = document.documentElement.style;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let frameId = 0;
+
+    const updateFlyerDrop = () => {
+      frameId = 0;
+
+      if (motionQuery.matches) {
+        rootStyle.setProperty('--hero-flyer-scroll-drop', '0px');
+        return;
+      }
+
+      const dropProgress = Math.max(0, Math.min(1, (window.scrollY - 24) / 220));
+      const dropPx = dropProgress * 56;
+      rootStyle.setProperty('--hero-flyer-scroll-drop', `${dropPx.toFixed(2)}px`);
+    };
+
+    const requestFlyerDropUpdate = () => {
+      if (frameId) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(updateFlyerDrop);
+    };
+
+    updateFlyerDrop();
+    window.addEventListener('scroll', requestFlyerDropUpdate, { passive: true });
+    window.addEventListener('resize', requestFlyerDropUpdate);
+    motionQuery.addEventListener('change', requestFlyerDropUpdate);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener('scroll', requestFlyerDropUpdate);
+      window.removeEventListener('resize', requestFlyerDropUpdate);
+      motionQuery.removeEventListener('change', requestFlyerDropUpdate);
+      rootStyle.removeProperty('--hero-flyer-scroll-drop');
+    };
+  }, []);
+
+  React.useEffect(() => {
     if (!isThemeModalOpen) {
       return undefined;
     }
@@ -227,7 +281,7 @@ function App() {
   }, [isThemeModalOpen]);
 
   return (
-    <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode} ${MENU_BAR_STAYS_AT_TOP ? 'menu-bar-fixed' : ''}`}>
+    <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode} ${ME_ANIMATION_CLASS} ${MENU_BAR_STAYS_AT_TOP ? 'menu-bar-fixed' : ''}`}>
       {creepyEyeBackgroundEnabled ? <CreepyEyeBackground opacity={selectedTheme.canvasOpacity} /> : null}
       {hexagon3dBackgroundEnabled ? <Hexagon3dBackground opacity={selectedTheme.canvasOpacity} uiMode={activeUiMode} /> : null}
       {birdsBackgroundEnabled ? <BirdsBackground opacity={selectedTheme.canvasOpacity} /> : null}
@@ -333,6 +387,25 @@ function App() {
             </div>
           </div>
 
+          <div className="hero-section-break-flyer" aria-hidden="true">
+            <div className="hero-flying-me">
+              <img
+                className="hero-flying-me-photo"
+                src={HeadshotNew}
+                alt=""
+                draggable={false}
+              />
+              <div className="hero-flying-me-callout">
+                <span>Me</span>
+                <svg viewBox="0 0 92 34" focusable="false">
+                  <path d="M88 16C70 4 45 4 18 16" />
+                  <path d="M18 16l14-10" />
+                  <path d="M18 16l14 11" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
           <div className="header">
             <div className="header-text fade-up">
               <p className="subhead-small">Full Stack Developer</p>
@@ -370,25 +443,6 @@ function App() {
                 ))}
               </div>
 
-            </div>
-          </div>
-        </div>
-
-        <div className="hero-section-break-flyer" aria-hidden="true">
-          <div className="hero-flying-me">
-            <img
-              className="hero-flying-me-photo"
-              src={HeadshotNew}
-              alt=""
-              draggable={false}
-            />
-            <div className="hero-flying-me-callout">
-              <span>Me</span>
-              <svg viewBox="0 0 92 34" focusable="false">
-                <path d="M88 16C70 4 45 4 18 16" />
-                <path d="M18 16l14-10" />
-                <path d="M18 16l14 11" />
-              </svg>
             </div>
           </div>
         </div>
