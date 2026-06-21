@@ -52,6 +52,12 @@ const WORKED_AT_LINKS = [
   { name: 'Helpful Engineering', href: 'https://helpfulengineering.org/' },
   { name: 'VincentDunn.com', href: 'https://www.vincentdunn.com/' },
 ];
+const HERO_PROJECT_LINKS = {
+  chess: 'https://chess-helper-frontend-production.up.railway.app/',
+  intention: 'https://intention-setting-production.up.railway.app/henrymdeutsch',
+  vincent: 'https://www.vincentdunn.com',
+  checkout: 'https://devpost.com/software/check-it-out',
+};
 const LIQUID_GLASS_ALPHA_STOPS = [
   0.02, 0.04, 0.05, 0.08, 0.09, 0.1, 0.11, 0.14, 0.16, 0.2,
   0.22, 0.24, 0.26, 0.28, 0.3, 0.32, 0.34, 0.36, 0.38, 0.4,
@@ -354,37 +360,61 @@ function App() {
       <div className="content">
         <div className="header-container" id="home">
           <div className="hero-video-collage" aria-label="Project highlights">
-            <div className="hero-video-card hero-video-card-chess">
+            <a
+              className="hero-video-card hero-video-card-chess"
+              href={HERO_PROJECT_LINKS.chess}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open ChessHelper project"
+            >
               <div className="hero-video-frame">
                 <video autoPlay loop muted playsInline preload="metadata" poster={ChessHelperPoster} aria-hidden="true">
                   <source src={ChessHelperDemo} />
                 </video>
               </div>
-            </div>
-            <div className="hero-video-card hero-video-card-intention">
+            </a>
+            <a
+              className="hero-video-card hero-video-card-intention"
+              href={HERO_PROJECT_LINKS.intention}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open Intention Setter usage dashboard"
+            >
               <div className="hero-video-frame">
                 <video autoPlay loop muted playsInline preload="metadata" poster={IntentionSetterPoster} aria-hidden="true">
                   <source src={IntentionSetterDemo} />
                 </video>
               </div>
               <p className="hero-video-caption">See my actual doxxed social media use</p>
-            </div>
-            <div className="hero-video-card hero-video-card-vincent">
+            </a>
+            <a
+              className="hero-video-card hero-video-card-vincent"
+              href={HERO_PROJECT_LINKS.vincent}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open Vincent Dunn website"
+            >
               <div className="hero-video-frame">
                 <video autoPlay loop muted playsInline preload="metadata" poster={VincentPoster} aria-hidden="true">
                   <source src={VincentDemo} />
                 </video>
               </div>
               <p className="hero-video-caption">Freelance: New site increased client book sales 3x</p>
-            </div>
-            <div className="hero-video-card hero-video-card-checkout">
+            </a>
+            <a
+              className="hero-video-card hero-video-card-checkout"
+              href={HERO_PROJECT_LINKS.checkout}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open CheckItOut Devpost project"
+            >
               <div className="hero-video-frame">
                 <video autoPlay loop muted playsInline preload="metadata" poster={CheckItOutPoster} aria-hidden="true">
                   <source src={CheckItOutDemo} />
                 </video>
               </div>
               <p className="hero-video-caption">Won 3rd / 43 teams at HopHacks Hackathon</p>
-            </div>
+            </a>
           </div>
 
           <div className="hero-section-break-flyer" aria-hidden="true">
