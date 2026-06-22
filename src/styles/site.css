@@ -6444,11 +6444,11 @@ body.ui-light .header-container {
 }
 
 body.ui-light .hero-video-collage {
-  z-index: 5;
+  z-index: 6;
 }
 
 body.ui-light .hero-section-break-flyer {
-  z-index: 6;
+  z-index: 5;
 }
 
 body.ui-light .hero-video-card-intention,
