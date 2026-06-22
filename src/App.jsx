@@ -46,6 +46,7 @@ const ME_ANIMATION_CLASS_BY_STYLE = {
   [ME_ANIMATION_STYLES.MOVE_VIDEOS]: 'me-animation-move-videos',
 };
 const ME_ANIMATION_CLASS = ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLE] || ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLES.ME_ANIMATION_ABOVE_FOLD];
+const HERO_FLYING_ME_RATE_EASE_MS = 650;
 const WORKED_AT_LINKS = [
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
@@ -163,6 +164,10 @@ HeroHeadshot.defaultProps = {
 };
 
 function App() {
+  const flyingMeRef = React.useRef(null);
+  const flyingMePlaybackRateRef = React.useRef(1);
+  const flyingMeRateFrameRef = React.useRef(0);
+
   const [themeId, setThemeId] = React.useState(() => {
     if (typeof window === 'undefined') {
       return DEFAULT_BACKGROUND_ID;
@@ -186,6 +191,149 @@ function App() {
   const hexagon3dBackgroundEnabled = selectedTheme.canvasType === 'hexagon-3d';
   const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
   const birdsBackgroundEnabled = selectedTheme.canvasType === 'birds';
+
+  const easeFlyingMePlaybackRate = React.useCallback((targetRate) => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const flyer = flyingMeRef.current;
+    if (!flyer || typeof flyer.getAnimations !== 'function') {
+      return;
+    }
+
+    if (flyingMeRateFrameRef.current) {
+      window.cancelAnimationFrame(flyingMeRateFrameRef.current);
+    }
+
+    const animations = flyer.getAnimations({ subtree: true });
+    const startRate = flyingMePlaybackRateRef.current;
+    const startTime = window.performance.now();
+
+    const setRate = (rate) => {
+      flyingMePlaybackRateRef.current = rate;
+      animations.forEach((animation) => {
+        animation.updatePlaybackRate(rate);
+      });
+    };
+
+    const updateRate = (time) => {
+      const progress = Math.min(1, (time - startTime) / HERO_FLYING_ME_RATE_EASE_MS);
+      const easedProgress = progress * progress * (3 - (2 * progress));
+      const nextRate = startRate + ((targetRate - startRate) * easedProgress);
+      setRate(nextRate);
+
+      if (progress < 1) {
+        flyingMeRateFrameRef.current = window.requestAnimationFrame(updateRate);
+        return;
+      }
+
+      flyingMeRateFrameRef.current = 0;
+      setRate(targetRate);
+    };
+
+    flyingMeRateFrameRef.current = window.requestAnimationFrame(updateRate);
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const pointer = {
+      x: 0,
+      y: 0,
+      active: false,
+    };
+    let frameId = 0;
+    let isFlyingMeHovered = false;
+
+    const containsPoint = (element) => {
+      if (!element) {
+        return false;
+      }
+
+      const rect = element.getBoundingClientRect();
+      return (
+        pointer.x >= rect.left
+        && pointer.x <= rect.right
+        && pointer.y >= rect.top
+        && pointer.y <= rect.bottom
+      );
+    };
+
+    const setFlyingMeHovered = (nextIsHovered) => {
+      if (nextIsHovered === isFlyingMeHovered) {
+        return;
+      }
+
+      isFlyingMeHovered = nextIsHovered;
+      const flyer = flyingMeRef.current;
+      if (flyer) {
+        flyer.classList.toggle('is-pointer-hovered', nextIsHovered);
+      }
+      easeFlyingMePlaybackRate(nextIsHovered ? 0 : 1);
+    };
+
+    const updateAnimatedHoverTargets = () => {
+      const flyer = flyingMeRef.current;
+      const photo = flyer?.querySelector('.hero-flying-me-photo');
+      const callout = flyer?.querySelector('.hero-flying-me-callout');
+      const nextIsFlyingMeHovered = pointer.active && (
+        containsPoint(flyer)
+        || containsPoint(photo)
+        || containsPoint(callout)
+      );
+
+      setFlyingMeHovered(nextIsFlyingMeHovered);
+
+      document.querySelectorAll('.hero-video-card').forEach((card) => {
+        card.classList.toggle('is-pointer-hovered', pointer.active && containsPoint(card));
+      });
+    };
+
+    const runHoverLoop = () => {
+      updateAnimatedHoverTargets();
+      frameId = window.requestAnimationFrame(runHoverLoop);
+    };
+
+    const startHoverLoop = () => {
+      if (!frameId) {
+        frameId = window.requestAnimationFrame(runHoverLoop);
+      }
+    };
+
+    const onPointerMove = (event) => {
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      pointer.active = true;
+      startHoverLoop();
+    };
+
+    const onPointerOut = (event) => {
+      if (event.relatedTarget) {
+        return;
+      }
+
+      pointer.active = false;
+      updateAnimatedHoverTargets();
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerout', onPointerOut);
+
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerout', onPointerOut);
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+      setFlyingMeHovered(false);
+      document.querySelectorAll('.hero-video-card.is-pointer-hovered').forEach((card) => {
+        card.classList.remove('is-pointer-hovered');
+      });
+    };
+  }, [easeFlyingMePlaybackRate]);
 
   React.useEffect(() => {
     const opacity = Math.max(0, Math.min(1, liquid_glass_opacity));
@@ -285,6 +433,12 @@ function App() {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [isThemeModalOpen]);
+
+  React.useEffect(() => () => {
+    if (flyingMeRateFrameRef.current) {
+      window.cancelAnimationFrame(flyingMeRateFrameRef.current);
+    }
+  }, []);
 
   return (
     <div className={`app-shell theme-${selectedTheme.id} ui-${activeUiMode} ${ME_ANIMATION_CLASS} ${MENU_BAR_STAYS_AT_TOP ? 'menu-bar-fixed' : ''}`}>
@@ -418,7 +572,10 @@ function App() {
           </div>
 
           <div className="hero-section-break-flyer" aria-hidden="true">
-            <div className="hero-flying-me">
+            <div
+              ref={flyingMeRef}
+              className="hero-flying-me"
+            >
               <img
                 className="hero-flying-me-photo"
                 src={HeadshotNew}

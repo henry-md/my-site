@@ -3368,6 +3368,7 @@ body.ui-light .header-container {
   transform: translate3d(-260px, var(--hero-flyer-scroll-drop), 0);
   animation: hero-flying-me-travel var(--hero-flyby-duration) linear infinite;
   opacity: 0.82;
+  pointer-events: auto;
   will-change: transform;
 }
 
@@ -3457,6 +3458,7 @@ body.ui-light .header-container {
 }
 
 .hero-video-card:hover,
+.hero-video-card.is-pointer-hovered,
 .hero-video-card:focus-visible {
   translate: 0 -4px;
 }
@@ -5681,21 +5683,25 @@ body.ui-light .hero-video-card-checkout video {
 }
 
 body.ui-light .hero-video-card-chess:hover video,
+body.ui-light .hero-video-card-chess.is-pointer-hovered video,
 body.ui-light .hero-video-card-chess:focus-visible video {
   opacity: 0.76;
 }
 
 body.ui-light .hero-video-card-intention:hover video,
+body.ui-light .hero-video-card-intention.is-pointer-hovered video,
 body.ui-light .hero-video-card-intention:focus-visible video {
   opacity: 0.78;
 }
 
 body.ui-light .hero-video-card-vincent:hover video,
+body.ui-light .hero-video-card-vincent.is-pointer-hovered video,
 body.ui-light .hero-video-card-vincent:focus-visible video {
   opacity: 0.88;
 }
 
 body.ui-light .hero-video-card-checkout:hover video,
+body.ui-light .hero-video-card-checkout.is-pointer-hovered video,
 body.ui-light .hero-video-card-checkout:focus-visible video {
   opacity: 0.8;
 }
@@ -6435,6 +6441,14 @@ body.ui-light .submit:hover {
 /* Keep the hero and project intro on one continuous paper field. */
 body.ui-light .header-container {
   background: transparent;
+}
+
+body.ui-light .hero-video-collage {
+  z-index: 5;
+}
+
+body.ui-light .hero-section-break-flyer {
+  z-index: 6;
 }
 
 body.ui-light .hero-video-card-intention,
