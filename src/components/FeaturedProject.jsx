@@ -7,6 +7,7 @@ class FeaturedProject extends React.Component {
     this.state = {
       mediaOutlineColor: null,
     };
+    this.videoRef = React.createRef();
     this._mounted = false;
     this._colorRequestId = 0;
   }
@@ -19,6 +20,10 @@ class FeaturedProject extends React.Component {
   componentDidUpdate(prevProps) {
     if (prevProps.poster !== this.props.poster) {
       this.setMediaOutlineFromPoster(this.props.poster);
+    }
+
+    if (prevProps.preload !== this.props.preload && this.props.preload === 'auto' && this.videoRef.current) {
+      this.videoRef.current.load();
     }
   }
 
@@ -74,6 +79,7 @@ class FeaturedProject extends React.Component {
     const {
       poster,
       src,
+      sources,
       alt,
       title,
       description,
@@ -86,18 +92,23 @@ class FeaturedProject extends React.Component {
       eyebrow,
       tags,
       mediaClassName,
+      preload,
     } = this.props;
     const { mediaOutlineColor } = this.state;
     const mediaStyle = mediaOutlineColor ? { '--featured-media-outline': mediaOutlineColor } : undefined;
     const mediaWrapClassName = ['featured-media-wrap', mediaClassName].filter(Boolean).join(' ');
     const mediaElementClassName = ['featured-video', mediaClassName].filter(Boolean).join(' ');
+    const shouldAttachVideoSources = preload !== 'none';
 
     return (
       <div className="featured-project fade-up">
         <div className={mediaWrapClassName}>
-          {src ? (
-            <video className={mediaElementClassName} autoPlay loop muted playsInline poster={poster} draggable={false} style={mediaStyle}>
-              <source src={src}></source>
+          {sources || src ? (
+            <video ref={this.videoRef} className={mediaElementClassName} autoPlay loop muted playsInline preload={preload} poster={poster} draggable={false} style={mediaStyle}>
+              {sources && shouldAttachVideoSources ? sources.map((source) => (
+                <source key={source.src} src={source.src} type={source.type} />
+              )) : null}
+              {!sources && src && shouldAttachVideoSources ? <source src={src}></source> : null}
               Your browser does not support this video format.
             </video>
           ) : (
@@ -132,6 +143,10 @@ class FeaturedProject extends React.Component {
 FeaturedProject.propTypes = {
   poster: PropTypes.string.isRequired,
   src: PropTypes.string,
+  sources: PropTypes.arrayOf(PropTypes.shape({
+    src: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+  })),
   alt: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
@@ -144,6 +159,20 @@ FeaturedProject.propTypes = {
   eyebrow: PropTypes.string,
   tags: PropTypes.arrayOf(PropTypes.string),
   mediaClassName: PropTypes.string,
+  preload: PropTypes.oneOf(['none', 'metadata', 'auto']),
+};
+
+FeaturedProject.defaultProps = {
+  src: undefined,
+  sources: undefined,
+  secondCallToAction: undefined,
+  secondCallToActionLink: undefined,
+  thirdCallToAction: undefined,
+  thirdCallToActionLink: undefined,
+  eyebrow: undefined,
+  tags: undefined,
+  mediaClassName: undefined,
+  preload: 'metadata',
 };
 
 export default FeaturedProject;

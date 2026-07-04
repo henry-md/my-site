@@ -18,10 +18,14 @@ import {
 } from './constants.ts';
 import { BACKGROUND_CONFIGS, DEFAULT_BACKGROUND_ID } from './background-configs.ts';
 
-import VincentDemo from './assets/new-vincent-dunn-demo.mov';
-import CheckItOutDemo from './assets/checkitout-demo.mov';
-import ChessHelperDemo from './assets/chess-helper-demo.mov';
-import IntentionSetterDemo from './assets/intention-setter-demo.mov';
+import VincentDemoLiteMp4 from './assets/videos/new-vincent-dunn-demo-downscaled-lite.mp4';
+import VincentDemoHeavyMp4 from './assets/videos/new-vincent-dunn-demo-downscaled-heavy.mp4';
+import CheckItOutDemoLiteMp4 from './assets/videos/checkitout-demo-downscaled-lite.mp4';
+import CheckItOutDemoHeavyMp4 from './assets/videos/checkitout-demo-downscaled-heavy.mp4';
+import ChessHelperDemoLiteMp4 from './assets/videos/chess-helper-demo-downscaled-lite.mp4';
+import ChessHelperDemoHeavyMp4 from './assets/videos/chess-helper-demo-downscaled-heavy.mp4';
+import IntentionSetterDemoLiteMp4 from './assets/videos/intention-setter-demo-downscaled-lite.mp4';
+import IntentionSetterDemoHeavyMp4 from './assets/videos/intention-setter-demo-downscaled-heavy.mp4';
 
 import VincentPoster from './assets/vincent-dunn-poster.png';
 import CheckItOutPoster from './assets/checkitout-poster.png';
@@ -58,6 +62,44 @@ const HERO_PROJECT_LINKS = {
   intention: 'https://intention-setting-production.up.railway.app/henrymdeutsch',
   vincent: 'https://www.vincentdunn.com',
   checkout: 'https://devpost.com/software/check-it-out',
+};
+const VIDEO_TYPE_MP4 = 'video/mp4';
+const HERO_VIDEO_PRIORITY_GRACE_MS = 1500;
+const HERO_VIDEO_FALLBACK_TIMEOUT_MS = 3000;
+const HERO_VIDEO_IDS = ['chess', 'intention', 'vincent', 'checkout'];
+const PROJECT_VIDEO_SOURCES = {
+  chess: {
+    lite: [
+      { src: ChessHelperDemoLiteMp4, type: VIDEO_TYPE_MP4 },
+    ],
+    heavy: [
+      { src: ChessHelperDemoHeavyMp4, type: VIDEO_TYPE_MP4 },
+    ],
+  },
+  intention: {
+    lite: [
+      { src: IntentionSetterDemoLiteMp4, type: VIDEO_TYPE_MP4 },
+    ],
+    heavy: [
+      { src: IntentionSetterDemoHeavyMp4, type: VIDEO_TYPE_MP4 },
+    ],
+  },
+  vincent: {
+    lite: [
+      { src: VincentDemoLiteMp4, type: VIDEO_TYPE_MP4 },
+    ],
+    heavy: [
+      { src: VincentDemoHeavyMp4, type: VIDEO_TYPE_MP4 },
+    ],
+  },
+  checkout: {
+    lite: [
+      { src: CheckItOutDemoLiteMp4, type: VIDEO_TYPE_MP4 },
+    ],
+    heavy: [
+      { src: CheckItOutDemoHeavyMp4, type: VIDEO_TYPE_MP4 },
+    ],
+  },
 };
 const LIQUID_GLASS_ALPHA_STOPS = [
   0.02, 0.04, 0.05, 0.08, 0.09, 0.1, 0.11, 0.14, 0.16, 0.2,
@@ -167,6 +209,8 @@ function App() {
   const flyingMeRef = React.useRef(null);
   const flyingMePlaybackRateRef = React.useRef(1);
   const flyingMeRateFrameRef = React.useRef(0);
+  const [heroVideoReadyIds, setHeroVideoReadyIds] = React.useState([]);
+  const [featuredVideosCanPreload, setFeaturedVideosCanPreload] = React.useState(false);
 
   const [themeId, setThemeId] = React.useState(() => {
     if (typeof window === 'undefined') {
@@ -191,6 +235,65 @@ function App() {
   const hexagon3dBackgroundEnabled = selectedTheme.canvasType === 'hexagon-3d';
   const creepyEyeBackgroundEnabled = selectedTheme.canvasType === 'creepy-eye';
   const birdsBackgroundEnabled = selectedTheme.canvasType === 'birds';
+  const featuredVideoPreload = featuredVideosCanPreload ? 'auto' : 'none';
+
+  const markHeroVideoReady = React.useCallback((videoId) => {
+    setHeroVideoReadyIds((currentIds) => (
+      currentIds.includes(videoId) ? currentIds : [...currentIds, videoId]
+    ));
+  }, []);
+
+  React.useEffect(() => {
+    if (heroVideoReadyIds.length >= HERO_VIDEO_IDS.length) {
+      const timeoutId = window.setTimeout(() => {
+        setFeaturedVideosCanPreload(true);
+      }, HERO_VIDEO_PRIORITY_GRACE_MS);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    }
+
+    return undefined;
+  }, [heroVideoReadyIds.length]);
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined;
+    }
+
+    const links = HERO_VIDEO_IDS.map((videoId) => {
+      const mp4Source = PROJECT_VIDEO_SOURCES[videoId].lite.find((source) => source.type === VIDEO_TYPE_MP4);
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'video';
+      link.href = mp4Source.src;
+      link.type = mp4Source.type;
+      link.fetchPriority = 'high';
+      document.head.appendChild(link);
+      return link;
+    });
+
+    return () => {
+      links.forEach((link) => {
+        link.remove();
+      });
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (featuredVideosCanPreload || typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setFeaturedVideosCanPreload(true);
+    }, HERO_VIDEO_FALLBACK_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [featuredVideosCanPreload]);
 
   const easeFlyingMePlaybackRate = React.useCallback((targetRate) => {
     if (typeof window === 'undefined') {
@@ -522,8 +625,10 @@ function App() {
               aria-label="Open ChessHelper project"
             >
               <div className="hero-video-frame">
-                <video autoPlay loop muted playsInline preload="metadata" poster={ChessHelperPoster} aria-hidden="true">
-                  <source src={ChessHelperDemo} />
+                <video autoPlay loop muted playsInline preload="auto" poster={ChessHelperPoster} aria-hidden="true" onLoadedMetadata={() => markHeroVideoReady('chess')} onLoadedData={() => markHeroVideoReady('chess')} onCanPlayThrough={() => markHeroVideoReady('chess')}>
+                  {PROJECT_VIDEO_SOURCES.chess.lite.map((source) => (
+                    <source key={source.src} src={source.src} type={source.type} />
+                  ))}
                 </video>
               </div>
             </a>
@@ -535,8 +640,10 @@ function App() {
               aria-label="Open Intention Setter usage dashboard"
             >
               <div className="hero-video-frame">
-                <video autoPlay loop muted playsInline preload="metadata" poster={IntentionSetterPoster} aria-hidden="true">
-                  <source src={IntentionSetterDemo} />
+                <video autoPlay loop muted playsInline preload="auto" poster={IntentionSetterPoster} aria-hidden="true" onLoadedMetadata={() => markHeroVideoReady('intention')} onLoadedData={() => markHeroVideoReady('intention')} onCanPlayThrough={() => markHeroVideoReady('intention')}>
+                  {PROJECT_VIDEO_SOURCES.intention.lite.map((source) => (
+                    <source key={source.src} src={source.src} type={source.type} />
+                  ))}
                 </video>
               </div>
               <p className="hero-video-caption">See my actual doxxed social media use<br />(tell me to get back to work: 914 272 5561)</p>
@@ -549,8 +656,10 @@ function App() {
               aria-label="Open Vincent Dunn website"
             >
               <div className="hero-video-frame">
-                <video autoPlay loop muted playsInline preload="metadata" poster={VincentPoster} aria-hidden="true">
-                  <source src={VincentDemo} />
+                <video autoPlay loop muted playsInline preload="auto" poster={VincentPoster} aria-hidden="true" onLoadedMetadata={() => markHeroVideoReady('vincent')} onLoadedData={() => markHeroVideoReady('vincent')} onCanPlayThrough={() => markHeroVideoReady('vincent')}>
+                  {PROJECT_VIDEO_SOURCES.vincent.lite.map((source) => (
+                    <source key={source.src} src={source.src} type={source.type} />
+                  ))}
                 </video>
               </div>
               <p className="hero-video-caption">Freelance: New site increased client book sales 3x</p>
@@ -563,8 +672,10 @@ function App() {
               aria-label="Open CheckItOut Devpost project"
             >
               <div className="hero-video-frame">
-                <video autoPlay loop muted playsInline preload="metadata" poster={CheckItOutPoster} aria-hidden="true">
-                  <source src={CheckItOutDemo} />
+                <video autoPlay loop muted playsInline preload="auto" poster={CheckItOutPoster} aria-hidden="true" onLoadedMetadata={() => markHeroVideoReady('checkout')} onLoadedData={() => markHeroVideoReady('checkout')} onCanPlayThrough={() => markHeroVideoReady('checkout')}>
+                  {PROJECT_VIDEO_SOURCES.checkout.lite.map((source) => (
+                    <source key={source.src} src={source.src} type={source.type} />
+                  ))}
                 </video>
               </div>
               <p className="hero-video-caption">Won 3rd / 43 teams at HopHacks Hackathon</p>
@@ -639,7 +750,8 @@ function App() {
 
           <FadeInSection key="0">
             <FeaturedProject
-              src={ChessHelperDemo}
+              sources={PROJECT_VIDEO_SOURCES.chess.heavy}
+              preload={featuredVideoPreload}
               poster={ChessHelperPoster}
               alt="Chess Helper project demo"
               title="ChessHelper: An Interactive Way to Practice Chess Theory"
@@ -655,7 +767,8 @@ function App() {
 
           <FadeInSection key="1">
             <FeaturedProject
-              src={IntentionSetterDemo}
+              sources={PROJECT_VIDEO_SOURCES.intention.heavy}
+              preload={featuredVideoPreload}
               poster={IntentionSetterPoster}
               alt="Intention Setter project"
               title="Intention Setter: Set Limits On Chrome Websites"
@@ -686,7 +799,8 @@ function App() {
 
           <FadeInSection key="2">
             <FeaturedProject
-              src={VincentDemo}
+              sources={PROJECT_VIDEO_SOURCES.vincent.heavy}
+              preload={featuredVideoPreload}
               poster={VincentPoster}
               alt="Vincent Dunn website demo"
               title="Vincent Dunn's Website"
@@ -701,7 +815,8 @@ function App() {
 
           <FadeInSection key="3">
             <FeaturedProject
-              src={CheckItOutDemo}
+              sources={PROJECT_VIDEO_SOURCES.checkout.heavy}
+              preload={featuredVideoPreload}
               poster={CheckItOutPoster}
               alt="Check It Out project demo"
               title="CheckItOut: Computer Vision Powered Solution to Checkout"
