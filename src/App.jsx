@@ -36,6 +36,7 @@ import RayTracerPoster from './assets/ray-tracer-poster.png';
 import Resume from './assets/HenryDeutschResume.pdf';
 import FancyHeadshot from './assets/headshot_fancy_small.png';
 import HeadshotNew from './assets/headshot-new.png';
+import HeadshotFlyerLite from './assets/headshot-new-flyer-lite.webp';
 
 import 'swiper/css';
 
@@ -51,6 +52,7 @@ const ME_ANIMATION_CLASS_BY_STYLE = {
 };
 const ME_ANIMATION_CLASS = ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLE] || ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLES.ME_ANIMATION_ABOVE_FOLD];
 const HERO_FLYING_ME_RATE_EASE_MS = 650;
+const HERO_HOVER_TARGET_POLL_MS = 80;
 const WORKED_AT_LINKS = [
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
@@ -348,8 +350,9 @@ function App() {
       y: 0,
       active: false,
     };
-    let frameId = 0;
+    let hoverPollTimeoutId = 0;
     let isFlyingMeHovered = false;
+    const heroVideoCards = Array.from(document.querySelectorAll('.hero-video-card'));
 
     const containsPoint = (element) => {
       if (!element) {
@@ -390,19 +393,19 @@ function App() {
 
       setFlyingMeHovered(nextIsFlyingMeHovered);
 
-      document.querySelectorAll('.hero-video-card').forEach((card) => {
+      heroVideoCards.forEach((card) => {
         card.classList.toggle('is-pointer-hovered', pointer.active && containsPoint(card));
       });
     };
 
     const runHoverLoop = () => {
       updateAnimatedHoverTargets();
-      frameId = window.requestAnimationFrame(runHoverLoop);
+      hoverPollTimeoutId = window.setTimeout(runHoverLoop, HERO_HOVER_TARGET_POLL_MS);
     };
 
     const startHoverLoop = () => {
-      if (!frameId) {
-        frameId = window.requestAnimationFrame(runHoverLoop);
+      if (!hoverPollTimeoutId) {
+        hoverPollTimeoutId = window.setTimeout(runHoverLoop, HERO_HOVER_TARGET_POLL_MS);
       }
     };
 
@@ -420,6 +423,10 @@ function App() {
 
       pointer.active = false;
       updateAnimatedHoverTargets();
+      if (hoverPollTimeoutId) {
+        window.clearTimeout(hoverPollTimeoutId);
+        hoverPollTimeoutId = 0;
+      }
     };
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -428,11 +435,11 @@ function App() {
     return () => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerout', onPointerOut);
-      if (frameId) {
-        window.cancelAnimationFrame(frameId);
+      if (hoverPollTimeoutId) {
+        window.clearTimeout(hoverPollTimeoutId);
       }
       setFlyingMeHovered(false);
-      document.querySelectorAll('.hero-video-card.is-pointer-hovered').forEach((card) => {
+      heroVideoCards.forEach((card) => {
         card.classList.remove('is-pointer-hovered');
       });
     };
@@ -687,12 +694,14 @@ function App() {
               ref={flyingMeRef}
               className="hero-flying-me"
             >
-              <img
-                className="hero-flying-me-photo"
-                src={HeadshotNew}
-                alt=""
-                draggable={false}
-              />
+              <div className="hero-flying-me-photo-wrap">
+                <img
+                  className="hero-flying-me-photo"
+                  src={HeadshotFlyerLite}
+                  alt=""
+                  draggable={false}
+                />
+              </div>
               <div className="hero-flying-me-callout">
                 <span>Me</span>
                 <svg viewBox="0 0 92 34" focusable="false">

@@ -3372,15 +3372,23 @@ body.ui-light .header-container {
   will-change: transform;
 }
 
-.hero-flying-me-photo {
+.hero-flying-me-photo-wrap {
   width: 100%;
-  height: auto;
   filter:
     drop-shadow(0 10px 14px rgba(17, 17, 14, 0.2))
     contrast(1.12)
     saturate(1.12);
+  transform: translateZ(0);
+  will-change: filter;
+}
+
+.hero-flying-me-photo {
+  display: block;
+  width: 100%;
+  height: auto;
   transform-origin: 51% 53%;
   animation: hero-flying-me-spin 1.05s linear infinite;
+  backface-visibility: hidden;
   will-change: transform;
 }
 
