@@ -104,6 +104,7 @@ class TestimonialSwiper extends React.Component {
         spaceBetween={TESTIMONIAL_SPACE_BETWEEN_PX}
         slidesPerView={this.state.slidesPerView}
         loop={true}
+        autoHeight={true}
         navigation={true}
         pagination={{ clickable: true }}
         modules={[Navigation, Pagination]}
