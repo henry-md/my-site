@@ -755,7 +755,10 @@ function App() {
         </div>
 
         <div className="projects section" id="featured">
-          <h2>Featured Work & Projects</h2>
+          <h2>Featured Hobby Projects</h2>
+          <p className="projects-intro">
+            I enjoy building apps for myself. Most are built to solve a problem I have.
+          </p>
 
           <FadeInSection key="0">
             <FeaturedProject

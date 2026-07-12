@@ -5995,6 +5995,14 @@ body.ui-light .section h2::before {
   background: rgba(32, 28, 23, 0.92);
 }
 
+.projects-intro {
+  max-width: 100%;
+  margin: -0.35rem 0 clamp(1.2rem, 2.4vw, 1.7rem);
+  color: rgba(74, 70, 64, 0.9);
+  font-size: clamp(0.94rem, 1.08vw, 1.02rem);
+  line-height: 1.58;
+}
+
 body.ui-light .featured-project,
 body.ui-light .projects .fade-in-section:first-of-type .featured-project {
   grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
