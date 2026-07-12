@@ -725,7 +725,7 @@ function App() {
               <p className={`hero-meta ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>Open to full time software engineering roles.</p>
 
               <div className="resume-contact">
-                <a className="subhead-resume" href={Resume} target="_blank" rel="noreferrer">View Resume</a>
+                <a className="subhead-resume" href={Resume} download="Henry-Deutsch-Resume.pdf">Download Resume</a>
                 <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get In Touch</a>
               </div>
 
