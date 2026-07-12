@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 
 // Make sure to run npm install @formspree/react
@@ -5,6 +6,47 @@ import { useForm, ValidationError } from '@formspree/react';
 
 function ContactForm() {
   const [state, handleSubmit] = useForm("mleqdbev");
+  const emailInputRef = useRef(null);
+
+  useEffect(() => {
+    const contactSection = emailInputRef.current?.closest('.contact.section');
+    if (!contactSection || typeof IntersectionObserver !== 'function') {
+      return undefined;
+    }
+
+    let focusTimeoutId;
+    let hasFocused = false;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (hasFocused) {
+        return;
+      }
+
+      if (entry.intersectionRatio >= 0.7) {
+        if (focusTimeoutId !== undefined) {
+          return;
+        }
+
+        focusTimeoutId = window.setTimeout(() => {
+          focusTimeoutId = undefined;
+          emailInputRef.current?.focus({ preventScroll: true });
+          hasFocused = true;
+          observer.disconnect();
+        }, 1000);
+        return;
+      }
+
+      window.clearTimeout(focusTimeoutId);
+      focusTimeoutId = undefined;
+    }, { threshold: 0.7 });
+
+    observer.observe(contactSection);
+
+    return () => {
+      window.clearTimeout(focusTimeoutId);
+      observer.disconnect();
+    };
+  }, []);
+
   // if (state.succeeded) {
   //     return <p>Thanks for joining!</p>;
   // }
@@ -22,7 +64,7 @@ function ContactForm() {
   return (
     <form className="contact-form" onSubmit={handleSubmitWithCallback}>
       <h2>Get In Touch!</h2>
-      <p className="contact-intro">Let me know what you&apos;re building <b>:</b>o</p>
+      <p className="contact-intro">Let me know what you&apos;re building &nbsp; 😮</p>
 
       <div className="name-email">
         <div className="field-wrap">
@@ -32,6 +74,7 @@ function ContactForm() {
             name="email"
             placeholder="Email address"
             required
+            ref={emailInputRef}
           />
           <ValidationError
             prefix="Email"
