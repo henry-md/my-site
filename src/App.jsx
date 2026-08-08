@@ -44,6 +44,7 @@ const THEME_STORAGE_KEY = 'site-theme-id';
 const UI_MODE_STORAGE_KEY = 'ui-mode-pref-v2';
 const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
+const RESUME_VIEW_URL = 'https://drive.google.com/file/d/1E38IJHAoIoyoBk-iDPKn7OVUoQ-pV1MQ/view?usp=sharing';
 const PROJECT_REVEAL_THRESHOLD = 0.12;
 const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
 const ME_ANIMATION_CLASS_BY_STYLE = {
@@ -725,7 +726,14 @@ function App() {
               <p className={`hero-meta ${ABOVE_FOLD_TEXT_SHIMMERS ? 'above-fold-text-shimmer' : ''}`}>Open to full time software engineering roles.</p>
 
               <div className="resume-contact">
-                <a className="subhead-resume" href={Resume} download="Henry-Deutsch-Resume.pdf">Download Resume</a>
+                <a
+                  className="subhead-resume"
+                  href={Resume}
+                  download="Henry-Deutsch-Resume.pdf"
+                  onClick={() => window.open(RESUME_VIEW_URL, '_blank', 'noopener,noreferrer')}
+                >
+                  See Resume
+                </a>
                 <a className="subhead-contact" href="#contact" onClick={smoothScroll}>Get In Touch</a>
               </div>
 
