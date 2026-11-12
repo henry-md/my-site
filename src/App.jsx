@@ -44,7 +44,6 @@ const THEME_STORAGE_KEY = 'site-theme-id';
 const UI_MODE_STORAGE_KEY = 'ui-mode-pref-v2';
 const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
-const RESUME_VIEW_URL = 'https://drive.google.com/file/d/1ux9IkKbMSwTyfhU6AP6B8tjSzqv9Afkx/view?usp=sharing';
 const PROJECT_REVEAL_THRESHOLD = 0.12;
 const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
 const ME_ANIMATION_CLASS_BY_STYLE = {
@@ -55,10 +54,10 @@ const ME_ANIMATION_CLASS = ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLE] || ME
 const HERO_FLYING_ME_RATE_EASE_MS = 650;
 const HERO_HOVER_TARGET_POLL_MS = 80;
 const WORKED_AT_LINKS = [
+  { name: 'Tenex', href: 'https://tenex.co/' },
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
   { name: 'Helpful Engineering', href: 'https://helpfulengineering.org/' },
-  { name: 'VincentDunn.com', href: 'https://www.vincentdunn.com/' },
 ];
 const HERO_PROJECT_LINKS = {
   chess: 'https://chess-helper-frontend-production.up.railway.app/',
@@ -730,7 +729,7 @@ function App() {
                   className="subhead-resume"
                   href={Resume}
                   download="Henry-Deutsch-Resume.pdf"
-                  onClick={() => window.open(RESUME_VIEW_URL, '_blank', 'noopener,noreferrer')}
+                  onClick={() => window.open(Resume, '_blank', 'noopener,noreferrer')}
                 >
                   See Resume
                 </a>
