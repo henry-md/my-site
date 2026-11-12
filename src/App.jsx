@@ -54,10 +54,10 @@ const ME_ANIMATION_CLASS = ME_ANIMATION_CLASS_BY_STYLE[ME_ANIMATION_STYLE] || ME
 const HERO_FLYING_ME_RATE_EASE_MS = 650;
 const HERO_HOVER_TARGET_POLL_MS = 80;
 const WORKED_AT_LINKS = [
+  { name: 'Tenex', href: 'https://tenex.co/' },
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
   { name: 'Helpful Engineering', href: 'https://helpfulengineering.org/' },
-  { name: 'VincentDunn.com', href: 'https://www.vincentdunn.com/' },
 ];
 const HERO_PROJECT_LINKS = {
   chess: 'https://chess-helper-frontend-production.up.railway.app/',
