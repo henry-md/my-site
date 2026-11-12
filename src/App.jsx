@@ -44,7 +44,6 @@ const THEME_STORAGE_KEY = 'site-theme-id';
 const UI_MODE_STORAGE_KEY = 'ui-mode-pref-v2';
 const UI_LIGHT = 'light';
 const UI_DARK = 'dark';
-const RESUME_VIEW_URL = 'https://drive.google.com/file/d/1ux9IkKbMSwTyfhU6AP6B8tjSzqv9Afkx/view?usp=sharing';
 const PROJECT_REVEAL_THRESHOLD = 0.12;
 const PROJECT_REVEAL_ROOT_MARGIN = '-72px 0px -10% 0px';
 const ME_ANIMATION_CLASS_BY_STYLE = {
@@ -730,7 +729,7 @@ function App() {
                   className="subhead-resume"
                   href={Resume}
                   download="Henry-Deutsch-Resume.pdf"
-                  onClick={() => window.open(RESUME_VIEW_URL, '_blank', 'noopener,noreferrer')}
+                  onClick={() => window.open(Resume, '_blank', 'noopener,noreferrer')}
                 >
                   See Resume
                 </a>
