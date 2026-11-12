@@ -57,7 +57,7 @@ const WORKED_AT_LINKS = [
   { name: 'Tenex', href: 'https://tenex.co/' },
   { name: 'NewForm', href: 'https://www.newform.com/' },
   { name: 'KnoWhiz', href: 'https://www.knowhiz.us/' },
-  { name: 'Helpful Engineering', href: 'https://helpfulengineering.org/' },
+  { name: 'HF Engineering', href: 'https://helpfulengineering.org/' },
 ];
 const HERO_PROJECT_LINKS = {
   chess: 'https://chess-helper-frontend-production.up.railway.app/',
